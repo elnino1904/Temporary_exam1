@@ -1395,4 +1395,166 @@ namespace Ex_1_12_7
 }
 
 /*********************/
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Ex_1_12_7
+{
+    static class Program
+    {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Tool_gen5());
+        }
+    }
+}
+/********************/
+namespace Ex_1_12_7
+{
+    partial class Menu
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Menu));
+            this.tb_pathWorkspace = new System.Windows.Forms.TextBox();
+            this.lb_folderPath = new System.Windows.Forms.Label();
+            this.bt_Save = new System.Windows.Forms.Button();
+            this.bt_Cancel = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // tb_pathWorkspace
+            // 
+            resources.ApplyResources(this.tb_pathWorkspace, "tb_pathWorkspace");
+            this.tb_pathWorkspace.Name = "tb_pathWorkspace";
+            this.tb_pathWorkspace.TextChanged += new System.EventHandler(this.tb_pathWorkspace_TextChanged);
+            // 
+            // lb_folderPath
+            // 
+            resources.ApplyResources(this.lb_folderPath, "lb_folderPath");
+            this.lb_folderPath.Name = "lb_folderPath";
+            // 
+            // bt_Save
+            // 
+            resources.ApplyResources(this.bt_Save, "bt_Save");
+            this.bt_Save.Name = "bt_Save";
+            this.bt_Save.UseVisualStyleBackColor = true;
+            this.bt_Save.Click += new System.EventHandler(this.bt_Save_Click);
+            // 
+            // bt_Cancel
+            // 
+            resources.ApplyResources(this.bt_Cancel, "bt_Cancel");
+            this.bt_Cancel.Name = "bt_Cancel";
+            this.bt_Cancel.UseVisualStyleBackColor = true;
+            this.bt_Cancel.Click += new System.EventHandler(this.bt_Cancel_Click);
+            // 
+            // Menu
+            // 
+            resources.ApplyResources(this, "$this");
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bt_Cancel);
+            this.Controls.Add(this.bt_Save);
+            this.Controls.Add(this.lb_folderPath);
+            this.Controls.Add(this.tb_pathWorkspace);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "Menu";
+            this.Load += new System.EventHandler(this.Menu_Load);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Label lb_folderPath;
+        public System.Windows.Forms.TextBox tb_pathWorkspace;
+        private System.Windows.Forms.Button bt_Save;
+        private System.Windows.Forms.Button bt_Cancel;
+    }
+}
+/*******************/
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Ex_1_12_7
+{
+    public partial class Menu : Form
+    {
+        public Menu()
+        {
+            InitializeComponent();
+        }
+        public string path_Wsp;
+        private const string path_txt_1 = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\Data\save.txt";
+        private void tb_pathWorkspace_TextChanged(object sender, EventArgs e)
+        {
+            path_Wsp = tb_pathWorkspace.Text;                  
+            
+        }
+
+        private void bt_Save_Click(object sender, EventArgs e)
+        {
+           
+            string t_addLine = path_Wsp;
+            t_addLine += Environment.NewLine;
+            System.IO.File.WriteAllText(path_txt_1, t_addLine);
+            t_addLine = "";
+            Tool_gen5.path_WorkSpace = path_Wsp;
+            MessageBox.Show("Save successfully", "Config");
+           
+        }
+
+        private void bt_Cancel_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void Menu_Load(object sender, EventArgs e)
+        {
+            tb_pathWorkspace.Text = Tool_gen5.path_WorkSpace;
+         
+        }
+    }
+}
 
