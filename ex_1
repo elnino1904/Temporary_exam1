@@ -1557,4 +1557,1547 @@ namespace Ex_1_12_7
         }
     }
 }
+////////////////////new/////////////////////
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Ex_1_12_7
+{
+    public partial class Tool_gen5 : Form
+    {
+        public Tool_gen5()
+        {
+            InitializeComponent();
+          
+        
+        }
+        //private bool change_ID = false;
+        //private bool change_module = false;
+        private double Eloc;
+        private double Number_fuction;
+        private string File_hash;
+        private const string Test_Analysis = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\TaskIssue_UnitName_test_analysis.xlsx";
+        private const string Checklist_path = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\TaskIssue_UnitName_Review_Checklist.xlsx";
+        private const string path_txt_1 = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\Data\save.txt";
+        public static string path_WorkSpace;
+        private string PDC;
+        private string reviewer;
+        private string Statement;
+        private string Decision;
+        private bool check_CCE = false;
+        private bool check_OPL = false;
+        private string except_file1;
+        private string except_file2;
+        private string except_file3 = ".gitignore";
+        private string source_Test;
+        private string TaskID;
+        private string ModuleNames;
+        private string mesage;
+        private const string path_txt = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\data\source_sandbox.txt"; // path to source test
+        private const string path_TaskID = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\data\TaskID.txt"; // path to source test
+        private const string path_ModuleName = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\data\ModuleName.txt"; // path to source test
+        private const string path_reviewer = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\data\Reviewer.txt"; // path to source test
+        private const string path_PDC = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\data\PDC.txt"; // path to source test
+        private const string path_Delivery_const = @"D:\Nguyen Trung Dung\Gen5\Deliver"; // path to Delivery folder
+       // private string path_Delivery_PJDC_ = @"D:\Nguyen Trung Dung\Gen5\Deliver"; // path to Delivery folder
+       
+       // private string directoryPath = @"D:\Nguyen Trung Dung\Gen5\Temp_folder\";
+        private string doc = @"\Documents";
+        private string rep = @"\Reports";
+        private string scr = @"\Scripts";
+        private string directoryPath_doc;
+        private string directoryPath_rep;
+        private string directoryPath_scr;
+        //file need to copy
+        private const string fileName_rep = "test_report.html";
+        private const string fileName_testmk = "test.mk";
+        private const string fileName_ipg = "ipg.cop";
+        private string file_testCpp;
+        private string file_testHpp;
+        private string file_hash;
+        private const string fileMakefile = "Makefile";
+        private string folder_testCpp;
+        //excel
+        private static Microsoft.Office.Interop.Excel.Workbook MyBook = null;
+        private static Microsoft.Office.Interop.Excel.Application MyApp = null;
+        private static Microsoft.Office.Interop.Excel.Worksheet MySheet = null;
+
+
+        private string sourceSandbox;
+        private void bt_createFolder_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                directoryPath_doc = path_WorkSpace + @"\" + TaskID + @"_" + ModuleNames + doc;
+                directoryPath_rep = path_WorkSpace + @"\" + TaskID + @"_" + ModuleNames + rep;
+                directoryPath_scr = path_WorkSpace + @"\" + TaskID + @"_" + ModuleNames + scr;
+
+
+
+                if (!System.IO.Directory.Exists(directoryPath_doc) && !System.IO.Directory.Exists(directoryPath_rep) && !System.IO.Directory.Exists(directoryPath_scr))
+                {
+                    //System.IO.File. ();
+                    // string sourceFile = System.IO.Path.Combine(directoryPath_scr, fileName);
+                    System.IO.Directory.CreateDirectory(directoryPath_doc);
+                    System.IO.Directory.CreateDirectory(directoryPath_rep);
+                    System.IO.Directory.CreateDirectory(directoryPath_scr);
+
+                    // print mesage
+                    mesage = "Create folder successfully" + Environment.NewLine;
+                    mesage += @"Task ID: " + TaskID;
+                    MessageBox.Show(mesage, "CREATE FOLDER");
+                }
+
+                else
+                {
+                    //string sourceFile = System.IO.Path.Combine(directoryPath_scr, fileName);
+                    string mesage = "Folder is already exist" + Environment.NewLine;
+                    MessageBox.Show(mesage, "ERROR");
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.InnerException.ToString());
+
+            }
+        }
+              
+
+      /*  private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            TaskID = IDTask.Text;
+
+        }
+             
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            ModuleNames = ModName.Text;
+            file_testCpp = "test_" + ModuleNames + ".cpp";
+            except_file1 = "test_" + ModuleNames + ".ctg";
+            except_file2 = "test_" + ModuleNames + ".ctr";
+            folder_testCpp = "test_" + ModuleNames;
+        }
+        */
+       
+        private void btCoppy_Click(object sender, EventArgs e)
+        {
+
+            string folCantata = "Cantata";
+            string folConfig = "configuration";
+            string foltest = "tests";
+            source_Test = sourceSandbox + @"\_test" + @"\" + ModuleNames;
+            if (System.IO.Directory.Exists(source_Test))
+            {
+                //create test cantata folder
+                string t_srcTestFolder = directoryPath_scr + @"\" + ModuleNames; // ..//Scripts/Modulde_Name
+                CreateFolder(t_srcTestFolder); // create module folder
+                coppyAllFile(source_Test, t_srcTestFolder); // all file after Module folder
+                coppySpecFolder(folCantata, source_Test, t_srcTestFolder); //copy Cantata folder name
+                string temp_srcCantata = source_Test + @"\Cantata";
+                string temp_destCantata = t_srcTestFolder + @"\Cantata";
+                //copy report
+                string temp_srcResult = temp_srcCantata + @"\results";
+                coppySpecFile(fileName_rep, temp_srcResult, directoryPath_rep);
+                //string temp_destCantata = t_srcTestFolder + @"\Cantata";
+                coppySpecFolder(folConfig, temp_srcCantata, temp_destCantata); //copy configuration folder name
+                coppySpecFolder(foltest, temp_srcCantata, temp_destCantata); //copy tests folder name
+                string temp_srcConfig = temp_srcCantata + @"\" + folConfig;
+                string temp_destConfig = temp_destCantata + @"\" + folConfig;
+                coppyAllFile(temp_srcConfig, temp_destConfig); // all file in folder configuration
+                string temp_srcTests = temp_srcCantata + @"\" + foltest;
+                string temp_destTests = temp_destCantata + @"\" + foltest;
+                //coppySpecFile(fileName_testmk, temp_srcTests, temp_destTests); // copy test.mk 
+                //coppySpecFile(fileName_ipg, temp_srcTests, temp_destTests); // copy ipg.cop
+                coppySpecFile(fileMakefile, temp_srcTests, temp_destTests);  // copy Makefile
+                string temp_srcTestsModName = temp_srcTests + @"\" + folder_testCpp;
+                string temp_destTestsModName = temp_destTests + @"\" + folder_testCpp;
+                coppySpecFolder(folder_testCpp, temp_srcTests, temp_destTests); // copy folder test_ModuleName
+                coppySpecFile(fileName_testmk, temp_srcTestsModName, temp_destTestsModName); // copy test.mk 
+                coppySpecFile(fileName_testmk, temp_srcTestsModName, directoryPath_scr); // copy test.mk to scripts folder                
+                coppySpecFile(fileName_ipg, temp_srcTestsModName, temp_destTestsModName); // copy ipg.cop
+                coppySpecFile(fileName_ipg, temp_srcTestsModName, directoryPath_scr); // copy ipg.cop to scripts folder
+                coppySpecFile(file_testCpp, temp_srcTestsModName, temp_destTestsModName); // copy test_ModuleName.cpp
+                coppySpecFile(file_testCpp, temp_srcTestsModName, directoryPath_scr);  // copy test_ModuleName.cpp to scripts folder
+                //zip folder
+                string startPath = t_srcTestFolder;
+                string zipPath = t_srcTestFolder + ".zip";
+                System.IO.Compression.ZipFile.CreateFromDirectory(startPath, zipPath);// create zip folder module test   
+                System.IO.Directory.Delete(t_srcTestFolder, true); // delete folder Module test
+              
+                //show
+                mesage = "FINISH";
+                MessageBox.Show(mesage, "COPY");
+             }
+            else 
+            {
+                mesage = "Directory not found";
+                MessageBox.Show(mesage, "ERROR");
+            }
+
+        }
+        private void coppySpecFile(string t_filename, string t_srcFile, string t_destFile)
+        {
+            if (System.IO.Directory.Exists(t_srcFile) && System.IO.Directory.Exists(t_destFile))
+            {
+                
+                string fileNameTest;
+                string[] files = System.IO.Directory.GetFiles(t_srcFile, t_filename);
+                foreach (string file_index in files)
+                {
+                    bool b_check = false;
+                    string temp_dest;
+                    fileNameTest = System.IO.Path.GetFileName(file_index);
+                    if (fileNameTest == except_file1 || fileNameTest == except_file2 || fileNameTest == except_file3) 
+                        {
+                            b_check = true;
+                    
+                         }
+                    if (b_check == false)
+                    {
+                        temp_dest = System.IO.Path.Combine(t_destFile, fileNameTest);
+                        System.IO.File.Copy(file_index, temp_dest, true);
+                        //reset temp_dest
+                        temp_dest = "";
+                    }
+                }
+            }
+            else
+            {
+                mesage = "Directory not found";
+                MessageBox.Show(mesage, "ERROR");
+
+            }
+        }
+        private void coppyAllFile(string t_source, string t_destFile)
+        {
+            if (System.IO.Directory.Exists(t_source) && System.IO.Directory.Exists(t_destFile))
+                {
+                
+                string fileNameTest;
+                string[] files = System.IO.Directory.GetFiles(t_source);
+                foreach (string file_index in files)
+                {
+                    bool b_check = false;
+                    string temp_dest;
+                    fileNameTest = System.IO.Path.GetFileName(file_index);
+                      if (fileNameTest == except_file1 || fileNameTest == except_file2 || fileNameTest == except_file3) 
+                        {
+                            b_check = true;
+                    
+                         }
+                      if (b_check == false)
+                      {
+                          temp_dest = System.IO.Path.Combine(t_destFile, fileNameTest);
+                          System.IO.File.Copy(file_index, temp_dest, true);
+                          //reset temp_dest
+                          temp_dest = "";
+                      }
+                }
+                }
+            else
+            {
+                mesage = "Directory not found";
+                MessageBox.Show(mesage, "ERROR");
+
+            }
+        }
+        private void coppyAllFile_except(string t_source, string t_destFile, string ex1, string  ex2, string ex3 )
+        {
+            if (System.IO.Directory.Exists(t_source) && System.IO.Directory.Exists(t_destFile))
+            {
+
+                string fileNameTest;
+                string[] files = System.IO.Directory.GetFiles(t_source);
+                foreach (string file_index in files)
+                {
+                    bool b_check = false;
+                    string temp_dest;
+                    fileNameTest = System.IO.Path.GetFileName(file_index);
+                    if (fileNameTest == ex1 || fileNameTest == ex2 || fileNameTest == ex3)
+                    {
+                        b_check = true;
+
+                    }
+                    if (b_check == false)
+                    {
+                        temp_dest = System.IO.Path.Combine(t_destFile, fileNameTest);
+                        System.IO.File.Copy(file_index, temp_dest, true);
+                        //reset temp_dest
+                        temp_dest = "";
+                    }
+                }
+            }
+            else
+            {
+                mesage = "Directory not found";
+                MessageBox.Show(mesage, "ERROR");
+
+            }
+        }
+            private void coppyAllFolder(string t_source, string t_dest) //not files
+            {
+           if (System.IO.Directory.Exists(t_source) && System.IO.Directory.Exists(t_dest))
+                {
+                string[] subdirectoryEntries = System.IO.Directory.GetDirectories(t_source);
+                foreach (string subdirectory in subdirectoryEntries)
+                {
+                   string temp_dest;
+                   string folderName = System.IO.Path.GetFileName(subdirectory);
+                   temp_dest = System.IO.Path.Combine(t_dest, folderName);
+                   CreateFolder(temp_dest);
+                }
+
+                }
+           else
+           {
+               mesage = "Directory not found";
+               MessageBox.Show(mesage, "ERROR");
+
+           }
+            }
+            private void coppySpecFolder(string t_specFolderName, string t_source, string t_dest) //not files
+            {
+                if (System.IO.Directory.Exists(t_source) && System.IO.Directory.Exists(t_dest))
+                {
+                    string[] subdirectoryEntries = System.IO.Directory.GetDirectories(t_source, t_specFolderName);
+                    foreach (string t_directory in subdirectoryEntries)
+                    {
+                        string temp_dest;
+                        string folderName = System.IO.Path.GetFileName(t_directory);
+                        temp_dest = System.IO.Path.Combine(t_dest, folderName);
+                        CreateFolder(temp_dest);
+                    }
+
+                }
+                else 
+                {
+                    mesage = "Directory not found";
+                    MessageBox.Show(mesage, "ERROR");
+                
+                }
+             
+            }
+        private void CreateFolder(string t_source) //not files
+        {
+            if (!System.IO.Directory.Exists(t_source))
+
+                System.IO.Directory.CreateDirectory(t_source);
+            else
+            {
+                string mesage = "Folder is already exist";
+                MessageBox.Show(mesage, "ERROR");
+                
+            
+            }
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            sourceSandbox = combSrc.Text;          
+
+            
+
+        }
+
+        private void combSrc_TextUpdate(object sender, EventArgs e)
+        {
+            sourceSandbox = combSrc.Text;
+                      
+        }
+
+        private void btAdd_Click(object sender, EventArgs e)
+        {
+            
+            string t_addLine = sourceSandbox;        
+            t_addLine += Environment.NewLine;
+            System.IO.File.AppendAllText(path_txt, t_addLine);
+            combSrc.Items.Add(t_addLine);
+            t_addLine = "";
+            MessageBox.Show("Add successfully", "ADD SOURCE");
+                               
+        }
+
+        private void configurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Menu f_menu = new Menu();
+            f_menu.ShowDialog();
+            
+        }
+
+        private void Tool_gen5_Load(object sender, EventArgs e)
+        {
+            //add source from file
+            System.IO.File.AppendAllText(path_txt, "");
+            System.IO.StreamReader file = new System.IO.StreamReader(path_txt);
+            string line;
+            while ((line = file.ReadLine()) != null)
+            {
+                combSrc.Items.Add(line);
+
+            }
+            file.Close();
+            //add path workspace
+            System.IO.File.AppendAllText(path_txt_1, "");
+            System.IO.StreamReader file1 = new System.IO.StreamReader(path_txt_1);
+            string line1;
+            while ((line1 = file1.ReadLine()) != null)
+            {
+                path_WorkSpace = line1;
+
+            }
+            file1.Close();
+           //
+            System.IO.File.AppendAllText(path_TaskID, "");
+            System.IO.StreamReader file2 = new System.IO.StreamReader(path_TaskID);
+            string line2;
+            while ((line2 = file2.ReadLine()) != null)
+            {
+                cb_TaskId.Items.Add(line2);
+
+            }
+            file2.Close();
+             //
+            System.IO.File.AppendAllText(path_ModuleName, "");
+            System.IO.StreamReader file3 = new System.IO.StreamReader(path_ModuleName);
+            string line3;
+            while ((line3 = file3.ReadLine()) != null)
+            {
+                cb_ModuleName.Items.Add(line3);
+
+            }
+            file3.Close();
+            //
+            System.IO.File.AppendAllText(path_reviewer, "");
+            System.IO.StreamReader file4 = new System.IO.StreamReader(path_reviewer);
+            string line4;
+            while ((line4 = file4.ReadLine()) != null)
+            {
+                cb_Reviewer.Items.Add(line4);
+
+            }
+            file4.Close();  
+            //
+            System.IO.File.AppendAllText(path_PDC, "");
+            System.IO.StreamReader file5 = new System.IO.StreamReader(path_PDC);
+            string line5;
+            while ((line5 = file5.ReadLine()) != null)
+            {
+                cb_PDC.Items.Add(line5);
+
+            }
+            file5.Close();  
+                   
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+       
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+             FolderBrowserDialog openFolderDialog = new FolderBrowserDialog();
+            openFolderDialog.Description = "Select soure sandbox folder";
+
+            if (openFolderDialog.ShowDialog() == DialogResult.OK)
+            {
+                sourceSandbox = openFolderDialog.SelectedPath;
+                combSrc.Text = sourceSandbox;
+            }
+        }
+
+        private void bt_reset_Click(object sender, EventArgs e)
+        {
+            System.IO.File.WriteAllText(path_txt, "");
+            combSrc.Items.Clear();
+            combSrc.ResetText();
+        }
+
+        private void bt_OpLr_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"\\bosch.com\dfsrb\DfsDE\DIV\CS\DE_CS$\Prj\DA\EZKL_Radar\03_Customers\90_SW-Staende\SystemC\DACore\Module_Test\Test_Results\SIT");
+        }
+
+        private void bt_OpWspace_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(path_WorkSpace);
+        }
+
+        private void bt_D_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"D:\");
+            
+        }
+
+        private void bt_excel_Click(object sender, EventArgs e)
+        {
+            if (System.IO.Directory.Exists(directoryPath_doc))
+            {
+                MyApp = new Microsoft.Office.Interop.Excel.Application();
+                MyApp.Visible = false;
+                MyBook = MyApp.Workbooks.Open(Checklist_path);
+                //sheet 1
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[1]; //open sheet 1
+                MySheet.Cells[11, 6] = "Nguyen Trung Dung"; //author
+                MySheet.Cells[12, 6] = reviewer; //reviewer
+                MySheet.Cells[13, 6] = reviewer; //reviewer
+                MySheet.Cells[14, 6] = PDC; //PDC
+                MySheet.Cells[11, 3] = "=TODAY()";          // get current day
+                MySheet.Cells[12, 3] = "=TODAY()";          // get current day
+                MySheet.Cells[13, 3] = "=TODAY()";          // get current day
+                MySheet.Cells[14, 3] = "=TODAY()";
+                //sheet Review data
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[2]; // open sheet 2
+                MySheet.Cells[2, 2] = "Project for development of DACore in SystemC"; // project's name
+                MySheet.Cells[21, 2] = file_testCpp;    // test_Modulename.cpp
+                file_testHpp = ModuleNames + ".hpp";   // test_Modulename.hpp
+                MySheet.Cells[14, 2] = file_testHpp;  //test_Modulename.hpp
+                MySheet.Cells[14, 3] = file_hash;  // file hash cpp
+                MySheet.Cells[43, 3] = reviewer;  // reviewer
+                MySheet.Cells[44, 3] = reviewer;  // reviewer
+                MySheet.Cells[45, 3] = PDC;  // PDC
+
+                //sheet TestAnalysis
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[3]; // open sheet 3
+                MySheet.Cells[2, 4] = "N.A";
+                MySheet.Cells[2, 5] = "New task";
+                MySheet.Cells[3, 4] = "N.A";
+                MySheet.Cells[3, 5] = "New task";
+                MySheet.Cells[5, 4] = "N.A";
+                MySheet.Cells[5, 5] = "No OPL";
+                MySheet.Cells[6, 4] = "N.A";
+                MySheet.Cells[6, 5] = "No OPL";
+
+                //sheet TC&TS review criteria
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[4]; // open sheet 3
+                MySheet.Cells[2, 4] = "N.A";
+                MySheet.Cells[2, 5] = "RQM is not available for DA core.";
+                MySheet.Cells[3, 4] = "N.A";
+                MySheet.Cells[3, 5] = "RQM is not available for DA core.";
+
+                MySheet.Cells[7, 5] = "Statement: " + Statement + "%, Decision: " + Decision + "%";
+                if (check_CCE)
+                {
+                    MySheet.Cells[7, 4] = "Y";
+                }
+                else MySheet.Cells[7, 4] = "N.A";
+                MySheet.Cells[10, 4] = "N.A";
+                MySheet.Cells[10, 5] = "RQM is not available for DA core.";
+                MySheet.Cells[13, 4] = "N.A";
+                MySheet.Cells[13, 5] = "no major warning";
+
+                //sheet Pre-Delivery Check
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[5]; // open sheet 4
+                
+                if (check_OPL)
+                {
+                    MySheet.Cells[2, 4] = "Y";
+                    MySheet.Cells[2, 5] = "all open points are closed";
+                }
+                else
+                {
+                    MySheet.Cells[2, 4] = "N.A";
+                    MySheet.Cells[2, 5] = "No OPL";
+
+                }
+                MyBook.SaveAs(directoryPath_doc + @"\" + TaskID + "_" + ModuleNames + "_Review_Checklist.xlsx", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, false, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                MyBook.Close();
+                //Test Analysis
+                MyBook = MyApp.Workbooks.Open(Test_Analysis);
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[1];
+                MySheet.Cells[17, 3] = "Nguyen Trung Dung"; // task author
+                MySheet.Cells[17, 4] = "=today()"; // get times
+                MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[2];
+                MySheet.Cells[2, 3] = "N.A";
+                MySheet.Cells[7, 4] = "' -Doxygen";
+                MySheet.Cells[7, 5] = "' -Create 1 new TC";
+                
+                //MessageBox.Show("Text found, position is Row:" + oRng.Row + " and column:" + oRng.Column); /////
+                MyBook.SaveAs(directoryPath_doc + @"\" + TaskID + "_" + ModuleNames + "_test_analysis.xlsx", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookDefault, Type.Missing, Type.Missing, false, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+                MyBook.Close();
+                MessageBox.Show("Successful", "Fill checklist");
+                
+            }
+            else 
+            {
+                MessageBox.Show("No source found", "Error");
+            }
+        }
+
+        private void tb_fileHash_TextChanged(object sender, EventArgs e)
+        {
+            file_hash = tb_fileHash.Text;
+        }
+
+        private void cb_CCExcept_CheckedChanged(object sender, EventArgs e)
+        {
+            check_CCE = cb_CCExcept.Checked;
+            
+        }
+
+        private void cb_OPL_CheckedChanged(object sender, EventArgs e)
+        {
+            check_OPL = cb_OPL.Checked;
+        }
+
+        private void tb_Statement_TextChanged(object sender, EventArgs e)
+        {
+            Statement = tb_Statement.Text;
+        }
+
+        private void tb_Decision_TextChanged(object sender, EventArgs e)
+        {
+            Decision = tb_Decision.Text;
+        }
+
+        private void cb_TaskId_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TaskID = cb_TaskId.Text;
+           
+        }
+        private void Update_file(string t_pathFile, string t_textAdd) 
+        {
+            string t_addLine = t_textAdd;
+            t_addLine += Environment.NewLine;
+            System.IO.File.AppendAllText(t_pathFile, t_addLine);           
+            t_addLine = "";
+        }
+
+        private void cb_ModuleName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            ModuleNames = cb_ModuleName.Text;
+            file_testCpp = "test_" + ModuleNames + ".cpp";
+            except_file1 = "test_" + ModuleNames + ".ctg";
+            except_file2 = "test_" + ModuleNames + ".ctr";
+            folder_testCpp = "test_" + ModuleNames;
+          
+           
+        }
+
+        private void cb_Reviewer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            reviewer = cb_Reviewer.Text;
+         
+        }
+
+        private void cb_PDC_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PDC = cb_PDC.Text;
+           
+        }
+
+        private void cb_TaskId_TextUpdate(object sender, EventArgs e)
+        {
+            TaskID = cb_TaskId.Text;
+           
+        }
+
+        private void cb_ModuleName_TextUpdate(object sender, EventArgs e)
+        {
+            ModuleNames = cb_ModuleName.Text;
+            file_testCpp = "test_" + ModuleNames + ".cpp";
+            except_file1 = "test_" + ModuleNames + ".ctg";
+            except_file2 = "test_" + ModuleNames + ".ctr";
+            folder_testCpp = "test_" + ModuleNames;
+           
+        }
+
+        private void cb_Reviewer_TextUpdate(object sender, EventArgs e)
+        {
+            reviewer = cb_Reviewer.Text;
+           
+        }
+
+        private void cb_PDC_TextUpdate(object sender, EventArgs e)
+        {
+            PDC = cb_PDC.Text;
+           
+        }
+
+        private void sAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+           
+            if (ModuleNames != null)
+            {
+                Update_file(path_ModuleName, ModuleNames);
+                cb_ModuleName.Items.Add(ModuleNames);
+            }
+            if (TaskID != null)
+            {
+                Update_file(path_TaskID, TaskID);
+                cb_TaskId.Items.Add(TaskID);
+            }
+            if (reviewer != null)
+            {
+                Update_file(path_reviewer, reviewer);
+                cb_Reviewer.Items.Add(reviewer);
+            }
+            if (PDC != null)
+            {
+                Update_file(path_PDC, PDC);
+                cb_PDC.Items.Add(PDC);
+            }
+        }
+
+        private Microsoft.Office.Interop.Excel.Range GetSpecifiedRange(string matchStr, Microsoft.Office.Interop.Excel.Worksheet objWs)
+        {
+            object missing = System.Reflection.Missing.Value;
+            Microsoft.Office.Interop.Excel.Range currentFind = null;
+            //Microsoft.Office.Interop.Excel.Range firstFind = null;
+            currentFind = objWs.get_Range("A1", "AM1000").Find(matchStr, missing,
+                           Microsoft.Office.Interop.Excel.XlFindLookIn.xlValues,
+                           Microsoft.Office.Interop.Excel.XlLookAt.xlPart,
+                           Microsoft.Office.Interop.Excel.XlSearchOrder.xlByRows,
+                           Microsoft.Office.Interop.Excel.XlSearchDirection.xlNext, false, missing, missing);
+            return currentFind;
+        }
+        private string Get_latestFlie(string t_source, string match_text) 
+        {
+            long time;
+            long max = 0;
+            string file_latest = "";
+             DateTime Date = new DateTime();
+             string[] files = System.IO.Directory.GetFiles(t_source, match_text + "*");
+             foreach (string file_index in files) 
+                 
+             {
+                 Date = System.IO.File.GetCreationTime(file_index);
+                 time = Date.ToFileTime();
+                 if (time > max)
+                 {
+                     max = time;
+                     file_latest = file_index;
+                 }              
+                               
+             }
+            return file_latest;
+        }
+
+        private void bt_OpenJR_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Get_latestFlie(@"\\bosch.com\dfsRB\DfsVN\LOC\Hc\RBVH\20_ESS\04_Projects\10_CC_DA\EI-300010\VW_PL\Project\AutoToolGen5\Estimation", "PJDC"));
+        }
+
+        private void bt_GetJR_Click(object sender, EventArgs e)
+        {
+            MyApp = new Microsoft.Office.Interop.Excel.Application();
+            MyApp.Visible = false;
+            MyBook = MyApp.Workbooks.Open(Get_latestFlie(@"\\bosch.com\dfsRB\DfsVN\LOC\Hc\RBVH\20_ESS\04_Projects\10_CC_DA\EI-300010\VW_PL\Project\AutoToolGen5\Estimation", "PJDC"));
+            //sheet 2
+            MySheet = (Microsoft.Office.Interop.Excel.Worksheet)MyBook.Sheets[2]; //open sheet 1
+            Microsoft.Office.Interop.Excel.Range oRng = GetSpecifiedRange(TaskID, MySheet);
+            if (oRng != null)
+            {
+             
+                Microsoft.Office.Interop.Excel.Range xlRange = MySheet.UsedRange;
+                File_hash = (string)(xlRange.Cells[oRng.Row, oRng.Column - 7] as Microsoft.Office.Interop.Excel.Range).Value2;
+                tb_FHash.Text  = File_hash;
+                Eloc = (double)(xlRange.Cells[oRng.Row, oRng.Column - 6] as Microsoft.Office.Interop.Excel.Range).Value2;
+                //tb_Eloc = Eloc;
+                Number_fuction = (double)(xlRange.Cells[oRng.Row, oRng.Column - 4] as Microsoft.Office.Interop.Excel.Range).Value2;
+                //tb_NumFunc.Text = Number_fuction;
+                string a = Convert.ToString(Eloc);
+                tb_Eloc.Text = a;
+                string b = Convert.ToString(Number_fuction);
+                tb_NumFunc.Text = b;
+
+            }
+            else
+            {
+                MessageBox.Show("Text is not founded");
+            }
+
+
+            MyBook.Close(false, Type.Missing, Type.Missing);
+
+         
+            MyApp.Quit();
+        }
+
+        private void tb_FHash_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tb_Eloc_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void bt_DeliverFolder_Click(object sender, EventArgs e)
+        {
+            string path_Delivery;
+            path_Delivery = path_Delivery_const + @"\" + ModuleNames.ToUpper();
+            string path_Delivery_PJDC_ = path_Delivery + @"\" + TaskID;
+            string path_doc = path_Delivery_PJDC_ + @"\" + doc;
+            string path_scr = path_Delivery_PJDC_ + @"\" + scr;
+            string path_rep = path_Delivery_PJDC_ + @"\" + rep;
+            if (!System.IO.Directory.Exists(path_Delivery))
+            {
+
+                System.IO.Directory.CreateDirectory(path_Delivery);
+                System.IO.Directory.CreateDirectory(path_Delivery_PJDC_);
+                coppyAllFolder(path_WorkSpace + @"\" + TaskID + @"_" + ModuleNames, path_Delivery_PJDC_);
+                coppyAllFile_except(directoryPath_doc, path_doc,TaskID + "_" + ModuleNames + "_test_analysis.xlsx","",""  );
+               // coppyAllFile(directoryPath_doc, path_doc);
+                coppyAllFile_except(directoryPath_scr, path_scr, ModuleNames + ".zip", "", "");
+                coppyAllFile(directoryPath_rep, path_rep);
+                //System.IO.Directory.CreateDirectory(path_doc);
+                //System.IO.Directory.CreateDirectory(path_scr);
+                //System.IO.Directory.CreateDirectory(path_rep);
+                // print mesage
+
+                mesage = "Create folder successfully" + Environment.NewLine;
+                mesage += @"Task ID: " + TaskID;
+                MessageBox.Show(mesage, "CREATE FOLDER");
+            }
+
+            else
+            {
+                
+                string mesage = "Folder is already exist" + Environment.NewLine;
+                MessageBox.Show(mesage, "ERROR");
+            }
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(path_Delivery_const);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Get_latestFlie(@"\\bosch.com\dfsRB\DfsVN\LOC\Hc\RBVH\20_ESS\04_Projects\10_CC_DA\EI-300010\VW_PL\Sandbox\Gen5\Built\Zip\pj-dc_int", "18."));
+        }
+       
+    }
+}
+/************************************//
+namespace Ex_1_12_7
+{
+    partial class Tool_gen5
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Tool_gen5));
+            this.bt_createFolder = new System.Windows.Forms.Button();
+            this.lbModuleName = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.author = new System.Windows.Forms.Label();
+            this.Company = new System.Windows.Forms.Label();
+            this.lbSandbox = new System.Windows.Forms.Label();
+            this.btCoppy = new System.Windows.Forms.Button();
+            this.combSrc = new System.Windows.Forms.ComboBox();
+            this.btAdd = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
+            this.bt_reset = new System.Windows.Forms.Button();
+            this.bt_OpWspace = new System.Windows.Forms.Button();
+            this.bt_OpLr = new System.Windows.Forms.Button();
+            this.bt_D = new System.Windows.Forms.Button();
+            this.bt_excel = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.tb_fileHash = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.cb_CCExcept = new System.Windows.Forms.CheckBox();
+            this.cb_OPL = new System.Windows.Forms.CheckBox();
+            this.tb_Statement = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.tb_Decision = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.cb_TaskId = new System.Windows.Forms.ComboBox();
+            this.cb_ModuleName = new System.Windows.Forms.ComboBox();
+            this.cb_Reviewer = new System.Windows.Forms.ComboBox();
+            this.cb_PDC = new System.Windows.Forms.ComboBox();
+            this.bt_OpenJR = new System.Windows.Forms.Button();
+            this.bt_GetJR = new System.Windows.Forms.Button();
+            this.tb_FHash = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.tb_Eloc = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.tb_NumFunc = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.bt_DeliverFolder = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.menuStrip1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // bt_createFolder
+            // 
+            this.bt_createFolder.AccessibleName = "";
+            this.bt_createFolder.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.bt_createFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.bt_createFolder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.bt_createFolder.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.bt_createFolder.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.bt_createFolder.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.bt_createFolder.Location = new System.Drawing.Point(275, 448);
+            this.bt_createFolder.Name = "bt_createFolder";
+            this.bt_createFolder.Size = new System.Drawing.Size(177, 62);
+            this.bt_createFolder.TabIndex = 0;
+            this.bt_createFolder.Text = "1 -> CREATE REVIEW FOLDER";
+            this.bt_createFolder.UseVisualStyleBackColor = false;
+            this.bt_createFolder.Click += new System.EventHandler(this.bt_createFolder_Click);
+            // 
+            // lbModuleName
+            // 
+            this.lbModuleName.AutoSize = true;
+            this.lbModuleName.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lbModuleName.Location = new System.Drawing.Point(29, 46);
+            this.lbModuleName.Name = "lbModuleName";
+            this.lbModuleName.Size = new System.Drawing.Size(53, 17);
+            this.lbModuleName.TabIndex = 2;
+            this.lbModuleName.Text = "TASK ID";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label1.Location = new System.Drawing.Point(14, 81);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(102, 17);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "MODULE NAME";
+            // 
+            // author
+            // 
+            this.author.AutoSize = true;
+            this.author.Font = new System.Drawing.Font("Segoe WP", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.author.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.author.Location = new System.Drawing.Point(1090, 486);
+            this.author.Name = "author";
+            this.author.Size = new System.Drawing.Size(55, 17);
+            this.author.TabIndex = 6;
+            this.author.Text = "VH2559";
+            // 
+            // Company
+            // 
+            this.Company.AutoSize = true;
+            this.Company.Font = new System.Drawing.Font("Segoe WP", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Company.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.Company.Location = new System.Drawing.Point(1077, 504);
+            this.Company.Name = "Company";
+            this.Company.Size = new System.Drawing.Size(91, 17);
+            this.Company.TabIndex = 7;
+            this.Company.Text = "JEOM_BOSCH";
+            // 
+            // lbSandbox
+            // 
+            this.lbSandbox.AutoSize = true;
+            this.lbSandbox.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lbSandbox.Location = new System.Drawing.Point(-1, 123);
+            this.lbSandbox.Name = "lbSandbox";
+            this.lbSandbox.Size = new System.Drawing.Size(120, 17);
+            this.lbSandbox.TabIndex = 10;
+            this.lbSandbox.Text = "SOURCE SANDBOX";
+            // 
+            // btCoppy
+            // 
+            this.btCoppy.AccessibleName = "";
+            this.btCoppy.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.btCoppy.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btCoppy.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btCoppy.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btCoppy.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.btCoppy.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.btCoppy.Location = new System.Drawing.Point(476, 448);
+            this.btCoppy.Name = "btCoppy";
+            this.btCoppy.Size = new System.Drawing.Size(177, 62);
+            this.btCoppy.TabIndex = 11;
+            this.btCoppy.Text = "2 -> COPY";
+            this.btCoppy.UseVisualStyleBackColor = false;
+            this.btCoppy.Click += new System.EventHandler(this.btCoppy_Click);
+            // 
+            // combSrc
+            // 
+            this.combSrc.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.combSrc.FormattingEnabled = true;
+            this.combSrc.Location = new System.Drawing.Point(116, 120);
+            this.combSrc.Name = "combSrc";
+            this.combSrc.Size = new System.Drawing.Size(429, 25);
+            this.combSrc.TabIndex = 12;
+            this.combSrc.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            this.combSrc.TextUpdate += new System.EventHandler(this.combSrc_TextUpdate);
+            // 
+            // btAdd
+            // 
+            this.btAdd.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btAdd.Location = new System.Drawing.Point(567, 153);
+            this.btAdd.Name = "btAdd";
+            this.btAdd.Size = new System.Drawing.Size(102, 23);
+            this.btAdd.TabIndex = 13;
+            this.btAdd.Text = "Add Source";
+            this.btAdd.UseVisualStyleBackColor = true;
+            this.btAdd.Click += new System.EventHandler(this.btAdd_Click);
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.setupToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1186, 24);
+            this.menuStrip1.TabIndex = 14;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sAToolStripMenuItem,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // sAToolStripMenuItem
+            // 
+            this.sAToolStripMenuItem.Name = "sAToolStripMenuItem";
+            this.sAToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.sAToolStripMenuItem.Text = "Save";
+            this.sAToolStripMenuItem.Click += new System.EventHandler(this.sAToolStripMenuItem_Click);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // setupToolStripMenuItem
+            // 
+            this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.configurationToolStripMenuItem});
+            this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
+            this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.setupToolStripMenuItem.Text = "Setup";
+            // 
+            // configurationToolStripMenuItem
+            // 
+            this.configurationToolStripMenuItem.Name = "configurationToolStripMenuItem";
+            this.configurationToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.configurationToolStripMenuItem.Text = "Configuration";
+            this.configurationToolStripMenuItem.Click += new System.EventHandler(this.configurationToolStripMenuItem_Click);
+            // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.button1.Location = new System.Drawing.Point(567, 120);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(102, 23);
+            this.button1.TabIndex = 15;
+            this.button1.Text = "Browse";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // bt_reset
+            // 
+            this.bt_reset.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_reset.Location = new System.Drawing.Point(567, 182);
+            this.bt_reset.Name = "bt_reset";
+            this.bt_reset.Size = new System.Drawing.Size(102, 23);
+            this.bt_reset.TabIndex = 16;
+            this.bt_reset.Text = "Reset";
+            this.bt_reset.UseVisualStyleBackColor = true;
+            this.bt_reset.Click += new System.EventHandler(this.bt_reset_Click);
+            // 
+            // bt_OpWspace
+            // 
+            this.bt_OpWspace.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_OpWspace.Location = new System.Drawing.Point(11, 448);
+            this.bt_OpWspace.Name = "bt_OpWspace";
+            this.bt_OpWspace.Size = new System.Drawing.Size(113, 25);
+            this.bt_OpWspace.TabIndex = 17;
+            this.bt_OpWspace.Text = "Open Workspace";
+            this.bt_OpWspace.UseVisualStyleBackColor = true;
+            this.bt_OpWspace.Click += new System.EventHandler(this.bt_OpWspace_Click);
+            // 
+            // bt_OpLr
+            // 
+            this.bt_OpLr.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_OpLr.Location = new System.Drawing.Point(11, 479);
+            this.bt_OpLr.Name = "bt_OpLr";
+            this.bt_OpLr.Size = new System.Drawing.Size(113, 25);
+            this.bt_OpLr.TabIndex = 18;
+            this.bt_OpLr.Text = "Open Lr";
+            this.bt_OpLr.UseVisualStyleBackColor = true;
+            this.bt_OpLr.Click += new System.EventHandler(this.bt_OpLr_Click);
+            // 
+            // bt_D
+            // 
+            this.bt_D.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_D.Location = new System.Drawing.Point(130, 448);
+            this.bt_D.Name = "bt_D";
+            this.bt_D.Size = new System.Drawing.Size(113, 25);
+            this.bt_D.TabIndex = 19;
+            this.bt_D.Text = "Open D:\\";
+            this.bt_D.UseVisualStyleBackColor = true;
+            this.bt_D.Click += new System.EventHandler(this.bt_D_Click);
+            // 
+            // bt_excel
+            // 
+            this.bt_excel.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.bt_excel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.bt_excel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.bt_excel.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.bt_excel.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_excel.Location = new System.Drawing.Point(673, 448);
+            this.bt_excel.Name = "bt_excel";
+            this.bt_excel.Size = new System.Drawing.Size(147, 62);
+            this.bt_excel.TabIndex = 20;
+            this.bt_excel.Text = "3 -> FILL FILE EXCEL";
+            this.bt_excel.UseVisualStyleBackColor = false;
+            this.bt_excel.Click += new System.EventHandler(this.bt_excel_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label2.Location = new System.Drawing.Point(3, 164);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(116, 17);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "FILE HASH OF .CPP";
+            // 
+            // tb_fileHash
+            // 
+            this.tb_fileHash.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.tb_fileHash.Location = new System.Drawing.Point(116, 161);
+            this.tb_fileHash.Name = "tb_fileHash";
+            this.tb_fileHash.Size = new System.Drawing.Size(429, 25);
+            this.tb_fileHash.TabIndex = 22;
+            this.tb_fileHash.TextChanged += new System.EventHandler(this.tb_fileHash_TextChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label3.Location = new System.Drawing.Point(23, 199);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(68, 17);
+            this.label3.TabIndex = 23;
+            this.label3.Text = "REVIEWER";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label4.Location = new System.Drawing.Point(38, 239);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(32, 17);
+            this.label4.TabIndex = 25;
+            this.label4.Text = "PDC";
+            // 
+            // cb_CCExcept
+            // 
+            this.cb_CCExcept.AutoSize = true;
+            this.cb_CCExcept.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.cb_CCExcept.Location = new System.Drawing.Point(116, 346);
+            this.cb_CCExcept.Name = "cb_CCExcept";
+            this.cb_CCExcept.Size = new System.Drawing.Size(157, 17);
+            this.cb_CCExcept.TabIndex = 27;
+            this.cb_CCExcept.Text = "Code Coverage Exception";
+            this.cb_CCExcept.UseVisualStyleBackColor = true;
+            this.cb_CCExcept.CheckedChanged += new System.EventHandler(this.cb_CCExcept_CheckedChanged);
+            // 
+            // cb_OPL
+            // 
+            this.cb_OPL.AutoSize = true;
+            this.cb_OPL.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.cb_OPL.Location = new System.Drawing.Point(316, 346);
+            this.cb_OPL.Name = "cb_OPL";
+            this.cb_OPL.Size = new System.Drawing.Size(46, 17);
+            this.cb_OPL.TabIndex = 28;
+            this.cb_OPL.Text = "OPL";
+            this.cb_OPL.UseVisualStyleBackColor = true;
+            this.cb_OPL.CheckedChanged += new System.EventHandler(this.cb_OPL_CheckedChanged);
+            // 
+            // tb_Statement
+            // 
+            this.tb_Statement.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tb_Statement.Location = new System.Drawing.Point(116, 369);
+            this.tb_Statement.Name = "tb_Statement";
+            this.tb_Statement.Size = new System.Drawing.Size(80, 22);
+            this.tb_Statement.TabIndex = 30;
+            this.tb_Statement.TextChanged += new System.EventHandler(this.tb_Statement_TextChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label5.Location = new System.Drawing.Point(35, 374);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(66, 17);
+            this.label5.TabIndex = 29;
+            this.label5.Text = "Statement";
+            // 
+            // tb_Decision
+            // 
+            this.tb_Decision.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.tb_Decision.Location = new System.Drawing.Point(116, 397);
+            this.tb_Decision.Name = "tb_Decision";
+            this.tb_Decision.Size = new System.Drawing.Size(80, 22);
+            this.tb_Decision.TabIndex = 32;
+            this.tb_Decision.TextChanged += new System.EventHandler(this.tb_Decision_TextChanged);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label6.Location = new System.Drawing.Point(39, 397);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(57, 17);
+            this.label6.TabIndex = 31;
+            this.label6.Text = "Decision";
+            // 
+            // cb_TaskId
+            // 
+            this.cb_TaskId.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cb_TaskId.FormattingEnabled = true;
+            this.cb_TaskId.Location = new System.Drawing.Point(116, 40);
+            this.cb_TaskId.Name = "cb_TaskId";
+            this.cb_TaskId.Size = new System.Drawing.Size(429, 25);
+            this.cb_TaskId.TabIndex = 33;
+            this.cb_TaskId.SelectedIndexChanged += new System.EventHandler(this.cb_TaskId_SelectedIndexChanged);
+            this.cb_TaskId.TextUpdate += new System.EventHandler(this.cb_TaskId_TextUpdate);
+            // 
+            // cb_ModuleName
+            // 
+            this.cb_ModuleName.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cb_ModuleName.FormattingEnabled = true;
+            this.cb_ModuleName.Location = new System.Drawing.Point(116, 79);
+            this.cb_ModuleName.Name = "cb_ModuleName";
+            this.cb_ModuleName.Size = new System.Drawing.Size(429, 25);
+            this.cb_ModuleName.TabIndex = 34;
+            this.cb_ModuleName.SelectedIndexChanged += new System.EventHandler(this.cb_ModuleName_SelectedIndexChanged);
+            this.cb_ModuleName.TextUpdate += new System.EventHandler(this.cb_ModuleName_TextUpdate);
+            // 
+            // cb_Reviewer
+            // 
+            this.cb_Reviewer.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cb_Reviewer.FormattingEnabled = true;
+            this.cb_Reviewer.Location = new System.Drawing.Point(116, 199);
+            this.cb_Reviewer.Name = "cb_Reviewer";
+            this.cb_Reviewer.Size = new System.Drawing.Size(429, 25);
+            this.cb_Reviewer.TabIndex = 35;
+            this.cb_Reviewer.SelectedIndexChanged += new System.EventHandler(this.cb_Reviewer_SelectedIndexChanged);
+            this.cb_Reviewer.TextUpdate += new System.EventHandler(this.cb_Reviewer_TextUpdate);
+            // 
+            // cb_PDC
+            // 
+            this.cb_PDC.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cb_PDC.FormattingEnabled = true;
+            this.cb_PDC.Location = new System.Drawing.Point(116, 237);
+            this.cb_PDC.Name = "cb_PDC";
+            this.cb_PDC.Size = new System.Drawing.Size(429, 25);
+            this.cb_PDC.TabIndex = 36;
+            this.cb_PDC.SelectedIndexChanged += new System.EventHandler(this.cb_PDC_SelectedIndexChanged);
+            this.cb_PDC.TextUpdate += new System.EventHandler(this.cb_PDC_TextUpdate);
+            // 
+            // bt_OpenJR
+            // 
+            this.bt_OpenJR.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_OpenJR.Location = new System.Drawing.Point(1052, 426);
+            this.bt_OpenJR.Name = "bt_OpenJR";
+            this.bt_OpenJR.Size = new System.Drawing.Size(113, 25);
+            this.bt_OpenJR.TabIndex = 37;
+            this.bt_OpenJR.Text = "Open Latest JIRA";
+            this.bt_OpenJR.UseVisualStyleBackColor = true;
+            this.bt_OpenJR.Click += new System.EventHandler(this.bt_OpenJR_Click);
+            // 
+            // bt_GetJR
+            // 
+            this.bt_GetJR.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.bt_GetJR.Location = new System.Drawing.Point(1052, 394);
+            this.bt_GetJR.Name = "bt_GetJR";
+            this.bt_GetJR.Size = new System.Drawing.Size(113, 25);
+            this.bt_GetJR.TabIndex = 38;
+            this.bt_GetJR.Text = "Get JIRA Est";
+            this.bt_GetJR.UseVisualStyleBackColor = true;
+            this.bt_GetJR.Click += new System.EventHandler(this.bt_GetJR_Click);
+            // 
+            // tb_FHash
+            // 
+            this.tb_FHash.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.tb_FHash.Location = new System.Drawing.Point(835, 38);
+            this.tb_FHash.Name = "tb_FHash";
+            this.tb_FHash.Size = new System.Drawing.Size(322, 25);
+            this.tb_FHash.TabIndex = 40;
+            this.tb_FHash.TextChanged += new System.EventHandler(this.tb_FHash_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label7.Location = new System.Drawing.Point(741, 39);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(67, 17);
+            this.label7.TabIndex = 39;
+            this.label7.Text = "FILE HASH";
+            // 
+            // tb_Eloc
+            // 
+            this.tb_Eloc.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.tb_Eloc.Location = new System.Drawing.Point(835, 71);
+            this.tb_Eloc.Name = "tb_Eloc";
+            this.tb_Eloc.Size = new System.Drawing.Size(80, 25);
+            this.tb_Eloc.TabIndex = 42;
+            this.tb_Eloc.TextChanged += new System.EventHandler(this.tb_Eloc_TextChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label8.Location = new System.Drawing.Point(754, 76);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(39, 17);
+            this.label8.TabIndex = 41;
+            this.label8.Text = "ELOC";
+            // 
+            // tb_NumFunc
+            // 
+            this.tb_NumFunc.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.tb_NumFunc.Location = new System.Drawing.Point(1077, 71);
+            this.tb_NumFunc.Name = "tb_NumFunc";
+            this.tb_NumFunc.Size = new System.Drawing.Size(80, 25);
+            this.tb_NumFunc.TabIndex = 44;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label9.Location = new System.Drawing.Point(1002, 76);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(69, 17);
+            this.label9.TabIndex = 43;
+            this.label9.Text = "Num. Func";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.textBox1.Location = new System.Drawing.Point(835, 117);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(325, 25);
+            this.textBox1.TabIndex = 46;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.label10.Location = new System.Drawing.Point(715, 122);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(114, 17);
+            this.label10.TabIndex = 45;
+            this.label10.Text = "SOURCE MODULE";
+            // 
+            // bt_DeliverFolder
+            // 
+            this.bt_DeliverFolder.AccessibleName = "";
+            this.bt_DeliverFolder.BackColor = System.Drawing.SystemColors.ControlDark;
+            this.bt_DeliverFolder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.bt_DeliverFolder.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.bt_DeliverFolder.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.bt_DeliverFolder.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.bt_DeliverFolder.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.bt_DeliverFolder.Location = new System.Drawing.Point(845, 447);
+            this.bt_DeliverFolder.Name = "bt_DeliverFolder";
+            this.bt_DeliverFolder.Size = new System.Drawing.Size(165, 62);
+            this.bt_DeliverFolder.TabIndex = 47;
+            this.bt_DeliverFolder.Text = "4 -> CREATE DELIVER FOLDER";
+            this.bt_DeliverFolder.UseVisualStyleBackColor = false;
+            this.bt_DeliverFolder.Click += new System.EventHandler(this.bt_DeliverFolder_Click);
+            // 
+            // button2
+            // 
+            this.button2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.button2.Location = new System.Drawing.Point(130, 478);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(113, 25);
+            this.button2.TabIndex = 48;
+            this.button2.Text = "Open Delivery";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button3
+            // 
+            this.button3.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.button3.Location = new System.Drawing.Point(1052, 363);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(113, 25);
+            this.button3.TabIndex = 49;
+            this.button3.Text = "Latest Sandbox";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // Tool_gen5
+            // 
+            this.AllowDrop = true;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
+            this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.ClientSize = new System.Drawing.Size(1186, 530);
+            this.Controls.Add(this.button3);
+            this.Controls.Add(this.button2);
+            this.Controls.Add(this.bt_DeliverFolder);
+            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label10);
+            this.Controls.Add(this.tb_NumFunc);
+            this.Controls.Add(this.label9);
+            this.Controls.Add(this.tb_Eloc);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.tb_FHash);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.bt_GetJR);
+            this.Controls.Add(this.bt_OpenJR);
+            this.Controls.Add(this.cb_PDC);
+            this.Controls.Add(this.cb_Reviewer);
+            this.Controls.Add(this.cb_ModuleName);
+            this.Controls.Add(this.cb_TaskId);
+            this.Controls.Add(this.tb_Decision);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.tb_Statement);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.cb_OPL);
+            this.Controls.Add(this.cb_CCExcept);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.tb_fileHash);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.bt_excel);
+            this.Controls.Add(this.bt_D);
+            this.Controls.Add(this.bt_OpLr);
+            this.Controls.Add(this.bt_OpWspace);
+            this.Controls.Add(this.bt_reset);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btAdd);
+            this.Controls.Add(this.combSrc);
+            this.Controls.Add(this.btCoppy);
+            this.Controls.Add(this.lbSandbox);
+            this.Controls.Add(this.Company);
+            this.Controls.Add(this.author);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lbModuleName);
+            this.Controls.Add(this.bt_createFolder);
+            this.Controls.Add(this.menuStrip1);
+            this.Font = new System.Drawing.Font("Arial monospaced for SAP", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.HelpButton = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MaximizeBox = false;
+            this.Name = "Tool_gen5";
+            this.Text = "Tool";
+            this.Load += new System.EventHandler(this.Tool_gen5_Load);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.Button bt_createFolder;
+        private System.Windows.Forms.Label lbModuleName;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label author;
+        private System.Windows.Forms.Label Company;
+        private System.Windows.Forms.Label lbSandbox;
+        private System.Windows.Forms.Button btCoppy;
+        private System.Windows.Forms.ComboBox combSrc;
+        private System.Windows.Forms.Button btAdd;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem configurationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bt_reset;
+        private System.Windows.Forms.Button bt_OpWspace;
+        private System.Windows.Forms.Button bt_OpLr;
+        private System.Windows.Forms.Button bt_D;
+        private System.Windows.Forms.Button bt_excel;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox tb_fileHash;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox cb_CCExcept;
+        private System.Windows.Forms.CheckBox cb_OPL;
+        private System.Windows.Forms.TextBox tb_Statement;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox tb_Decision;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox cb_TaskId;
+        private System.Windows.Forms.ComboBox cb_ModuleName;
+        private System.Windows.Forms.ComboBox cb_Reviewer;
+        private System.Windows.Forms.ComboBox cb_PDC;
+        private System.Windows.Forms.ToolStripMenuItem sAToolStripMenuItem;
+        private System.Windows.Forms.Button bt_OpenJR;
+        private System.Windows.Forms.Button bt_GetJR;
+        private System.Windows.Forms.TextBox tb_FHash;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox tb_Eloc;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox tb_NumFunc;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button bt_DeliverFolder;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+
+    }
+}
+
 
