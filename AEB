@@ -1,0 +1,2097 @@
+	
+
+
+AEB Control 
+Requirement Specification
+
+Version 1.20
+
+2018.7.25
+
+
+
+
+
+
+
+
+
+Approved by: Line Manager
+	Tram N. 2018.7.25
+
+
+Checked by:	2018.7.24
+Hien C.				
+
+
+Document maintained by Miyabe
+SUZUKI Motor Corporation, Information / Safety System Development Department, Group1
+053-440-2850
+E-mail: miyabe@hhq.suzuki.co.jp
+
+	
+
+Contents
+
+1.	Outline	4
+1.1	Purposes of AEB system	4
+1.2	References	5
+1.3	Specifications priority	5
+1.4	Remarks	5
+1.5	Applied model	5
+1.6	Definition for Location Type	6
+1.7	Spec Type	7
+2.	Terminology	8
+3.	System configuration	11
+3.1	System block diagram	11
+3.2	Functions of AEB ECU	11
+3.2.1.	AEB System OFF by User	11
+3.2.2.	Judgment of system status	12
+3.2.3.	Notification of System Failure condition (Irreversible Failure) satisfied / System OFF / System Failure condition (Reversible Failure) satisfied	12
+3.2.4.	Detection/acknowledgement of target object	12
+3.2.5.	Warning control	12
+3.2.6.	Brake control function	13
+3.3	Requirements	13
+4.	Function requirements	14
+4.1	Determination of system status	14
+4.1.1.	State transition and definition	14
+4.1.2.	Conditions for state transition	18
+4.2	Driver’s AEB-OFF Function	22
+4.3	Notification of System OFF due to the driver, System Failure condition (Irreversible Failure) satisfied, System Failure condition (Reversible Failure) satisfied, Warning/Brake Control activation	23
+4.3.1.	Buzzer Blowing Conditions	23
+4.3.2.	Indicator Display Request when System Failure condition is met	25
+4.3.3.	Multi-Display Request when System Failure condition is met	28
+4.3.4.	Indicator Display Request when control conditions, excepting System Failure conditions, are met	33
+4.3.5.	Multi-Display Request when control conditions, excepting System Failure conditions, are met	35
+4.3.6.	Buzzer Blowing Requirements	37
+4.4	Control condition of Warning Control and Brake Control	42
+4.4.1.	Activate condition of Warning control and Brake control	42
+4.4.2.	Terminate condition of Warning control and Brake control	43
+4.4.3.	Suppression’s condition of Warning control and Brake control	45
+4.4.4.	Cancel condition of Warning control and Brake control’s operation	55
+4.4.5.	Speed range of Warning/Brake control operation	61
+4.5	Other requirements	62
+4.5.1.	CAN Signal Transceiver Process	62
+4.5.2.	Inhibition of controlling for Small Moving Object (SMO)	64
+5.	Failure diagnosis	65
+5.1	System Failure condition (Reversible Failure)	65
+5.2	System Failure condition (Irreversible Failure)	65
+6.	Revision History	66
+
+ 
+1.	Outline
+This document defines requirement specification for AEB ECU in Collision Mitigation Braking (AEB) system. 
+First of all, this chapter shows the purposes and functions of AEB system.
+1.1	Purposes of AEB system
+The AEB system comprises a millimeter wave radar, which is mounted on the front of the car. The radar detects cars traveling ahead, and if finding danger of collision, the system warns the driver aurally and visually (Warning Control). Furthermore, if the driver does not make maneuver for evasion in spite of the fact that the ego car gets closer to the car ahead and that the collision gets highly probable or almost unavoidable, the system automatically applies brake to reduce the collision speed (Brake Assist Function).
+When vehicle run at low speed ≤ 【AEBMAXVS】, if the driver does not recognize of getting closer to vehicle ahead and does not step on brake, then this system shall detect that vehicle ahead, judge as unavoidable collision and control brake automatically (Auto Brake Function).
+This system focuses on rear-end collision as type of car accident.
+As such collision accounts for about 40% of automotive traffic accidents, users can benefit a lot from this system, which reduces the collision speed or which may even help the ego car evade collision depending on circumstances.  
+While the system is mainly intended for reduction in the collision speed or evasion of collision in drive at low speed, the effect is dependent on the driving speed and following distance.
+ 
+The above figure shows an example of the system activation.   
+The millimeter wave radar of the ego car catches a car traveling ahead, before the car reaches Spot (1).  
+The car traveling ahead moderately applies brake, and stops at Spot (4), which results in gradual reduction in the distance between the two cars.  
+The system detects possibility of collision at Spot (1), and warns the driver with a buzzer and displays. 
+At Spot (2), where the collision probability becomes quite high, the system automatically applies strong brake.  As a result, the car stops at Spot (3), and thus, collision can be avoided.
+In case the driver steps on the brake as reaction to warning on Spot (1), the system is increased the pressure of brake and assist avoiding the collision.
+The aural and visual warning continues throughout the brake control, and ends when the brake is released after stop of the car.
+1.2	References
+Take a look at the following specs, in designing the details.
+CAN communication
+SUZUKI CAN SPECIFICATION PART1
+SUZUKI CAN SPECIFICATION PART2
+SUZUKI CAN SPECIFICATION PART3
+
+Failure diagnosis communication 
+SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART1
+SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART2
+
+1.3	Specifications priority
+Priority	Specification name	Issued department
+1
+(highest)	故障診断仕様書
+(Failure Diagnosis_ Requirement)	Information / Safety System Development Department, Group 1
+2	AEB制御_要求仕様書 ／
+ACC制御_要求仕様書 
+AEB Control_ Requirement Specification /
+ACC Control _ Requirement Specification 	Information / Safety System Development Department, Group 1
+
+1.4	Remarks
+Figures shown in [ ] are values obtained through application. Re-optimization is permitted only if the label name is changed. For the details of parameter list, refer to “AEB Control_ParameterList” issued by Suzuki Information / Safety System Development Department.
+
+1.5	Applied model
+For applied model, please refer “ACC Software Application Document” issued by Suzuki Information / Safety System Development Department, Group 1. 
+
+
+
+
+
+
+
+
+
+1.6	Definition for Location Type 
+In this specification, function operations are varied by location.
+Location type are defined as “Location1”, “Location2” as the following table. 
+
+Location	Location Type
+Not Japan	“Location1”
+Japan	“Location2”
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.7	Spec Type 
+It is possible to set valid/invalid for each spec type of function in ACC AEB Controller. 
+Spec type shall be decided by Variant code.
+Function to set valid/invalid for each spec type is defined as the below table. Spec Type has Type MRR and Type MFL. 
+
+・TYPE MRR
+If AEB SYSTEM sensor method is MRR (Mid Range Radar), spec type is TYPE MRR.
+TYPE MRR has to enable AEB-L, AEB-P, Prefill, EBA, and FCW. Please refer to below table.
+
+・TYPE MFL
+If AEB system sensor method is MFL (Multi Function Lidar), spec type is TYPE MFL.
+MFL has to disable AEB-L, AEB-P, EBA, Prefill, and FCW stationary. FCW Moving should be enabled. Please refer to below table.
+
+Table: AEB ECU function set by Spec type (TYPE MRR, TYPE MFL)
+○：Enable, ×：Disable
+Spec Type	Function
+	AEB-L	EBA	AEB-P	Prefill	FCW
+					Stationary	Moving
+Type MRR	○	○	○	○	○	○
+Type MFL	X	X	X	X	X	○
+
+※For determination of TypeMFL and TypeMRR, refer to 「SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART2 for AEB」 issued by Suzuki Information / Safety System Development Department, Group 4 Automobile Electronic & Electrical System Design Department, Group 5.
+ 
+2.	Terminology
+Terms used in this document are defined below.
+
+・	AEB ECU	： Autonomous Emergency Brake ECU
+Controller of the system
+The unit, used in combination with a sensor which detects a distance from a car or obstacle ahead and which calculates the relative speed, outputs control requests to actuators such as ESP and IPC.
+
+・	ECM	： Engine Control Module
+Engine control unit
+
+・	IPC	： Instrumental Panel Cluster
+Meter panel equipped a speedometer, indicators, displays and a buzzer etc... 
+IPC makes the buzzer sound or makes the indicators/displays turned on, in response to requests from the AEB ECU.
+
+・	SAS	： Steering Angle Sensor
+Steering angle sensor
+
+・	TCM	： Transmission Control Module
+Transmission control unit (except of transmission type MT)
+
+・	ESP	： Electric Stability Program
+Rollover Prevention system, Brake Control Controller 
+ESP carries out various brake controls, in response to requests from the AEB ECU.
+
+・	BCM	： Body Control Module
+Body control unit
+
+・	DLC	： Data Link Connector
+Connector for diagnosis tools
+
+・	AEB-L	： Autonomous Emergency Braking Low Speed
+Show Auto Brake Control in this specification
+
+・	AEB-P	： Autonomous Emergency Braking Partial brake
+Show Warning Brake Control in this specification
+
+・	EBA	： Emergency Braking Assist
+Show Brake Assist Control in this specification
+
+・	Prefill	： -
+Show Brake Prefill Control in this specification
+
+・	FCW	： Forward Collision Warning
+Show Forward Collision Warning control in this specification
+
+・	AEB OFF Switch
+ 
+The driver can disable the AEB system by pressing and holding the momentary switch on the instrumental panel.
+
+・	Stop lamp relay 
+The relay is activated to turn on the stop lamp while the system applies the brake control. 
+ESP, which receives the brake control request from the AEB ECU, activates the relay at the same time when activating the brake.
+
+・	Stop lamp
+The lamp is illuminated while the automatic brake control is carried out by the ESB system. 
+The lamp is turned on when ESP activates the stop lamp relay together with the brake.
+
+・	Buzzer
+Buzzer provided for IPC
+
+・	AEB failure W/L
+The warning lamp is provided for the IPC, and blinks when System Failure condition (Irreversible Failure) or System Failure condition (Reversible Failure) is met.
+ 
+
+・ AEB Operation Indicator
+ 
+Shows AEB control status as well as system error status in case the system is equipped with IPC.
+
+・ AEB OFF Indicator
+ 
+Shows that AEB system was turned OFF by the driver in case the system is equipped with an IPC.
+
+・ Multi-display
+The driver will be informed of brake requests and system status via Multi-display for systems which are equipped with an IPC. The following information will be displayed on Multi-display.
+	Multi-Display Information for Urging Brake Operation
+It is displayed to the driver once AEB is requested. Driver urgently should brake.
+	Multi-Display Information for AEB OFF
+It shows if the user has turned off the AEB system.
+	ID3A7 “Multi-Display Information for AEB Temporary Inhibition”
+It indicated that System Failure condition (Reversible Failure) of AEB system is met.
+	ID3A7 “Multi-Display Information for Radar Dirty”
+If the AEB ECU detects dirtiness on sensor’s surface and wave refraction abnormality, System Failure condition (Reversible Failure) of AEB system will be met and a sign will be displayed.
+	ID3A7 “Multi-Display Information for AEB Malfunction”
+Display if System Failure condition (Irreversible Failure) of AEB system is met.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.	System configuration
+3.1	 System block diagram
+Configuration of the AEB system is shown below.
+ 
+
+3.2	Functions of AEB ECU
+Functions which should be provided for the AEB ECU are defined below.
+This chapter deals only with the outline. For the details, see Chapter 4.
+
+3.2.1.	AEB System OFF by User 
+AEB system can be disabled through driver’s switch operation. This is intended for avoidance of malfunction which may be caused under certain circumstances.
+Every time when the IG is turned on, the system starts in the enable state, and by driver’s switch operation, it is disabled. The system is, then, enabled if the driver operates the switch again.
+*With spec TYPE MFL, this function is disabled.
+
+
+
+
+
+
+3.2.2.	Judgment of system status 
+It is determined if the system is in a normal state or not. 
+The normal state here means a state where failure of components and/or communication related to the AEB system is not detected.  
+The state that System Failure condition (Irreversible Failure) is met means a state where failure of components and/or communication related to the AEB system is occurring.
+If System Failure condition (Irreversible Failure) is not met, it is also determined whether System Failure condition (Reversible Failure) is met or not.
+
+The AEB ECU is able to send a warning request or brake control request if none of the following conditions is met: driver’s AEB system off operation, System Failure condition (Irreversible Failure), and System Failure condition (Reversible Failure).
+
+3.2.3.	Notification of System Failure condition (Irreversible Failure) satisfied / System OFF / System Failure condition (Reversible Failure) satisfied
+The driver is informed of the current system status via warning lamp, Multi-display lamp on the instrumental panel and buzzer. 
+  
+3.2.4.	Detection/acknowledgement of target object
+The AEB ECU detects cars traveling ahead with a millimeter wave radar, which is built in the unit. The unit, then, calculates possibility of collision on the basis of data on the detected car ahead and on the ego car, and acknowledges it as a target object for the warning or brake control. 
+
+3.2.5.	Warning control 
+Detecting danger of collision against the car ahead, the AEB system warns the driver acoustically with the buzzer and visually with the displays. The warning continues during the activation of the following brake control.  
+
+1)	Forward Collision Warning control (FCW) Stationary
+A function to warn driver by buzzer and Multi-display when AEB system detects vehicle ahead and finds danger of collision with an obstacle that is in standby state from the timing of detected. 
+※	With spec TYPE MFL, this function is disabled. 
+
+2)	Forward Collision Warning Control (FCW) Moving 
+A function to warn driver by buzzer and Multi-display when AEB system detects vehicle ahead and finds danger of collision with any obstacle that is judged to be moving (even if it moved only one time) from the timing of detected. 
+
+
+
+3.2.6.	Brake control function 
+The AEB system brake control has the functions 1) ～ 4), and the control is carried out if the ego car is most likely to collide into the car ahead or if the collision is unavoidable. 
+ 
+1) Automatic brake control (AEB - L)
+A function to apply strong brake automatically to reduce collision speed or to avoid a collision. 
+This function shall control brake automatically for stationary objects detected by millimeter wave radar. After the car stops, the system keeps the car static for a certain period of time.
+※ With spec TYPE MFL, this function is disabled.
+
+2) Warning Brake Control (AEB – P)
+A function to reduce speed and avoid a collision by the following functions: automatically applying brake slightly while ego car running, in order to urge the driver to press brake pedal; and automatically applying strong brake according to the danger of collision with the preceding car.
+This function is not operated for stationary objects detected by millimeter wave radar.
+※ With spec TYPE MFL, this function is disabled.
+
+3) Brake Assist Control (EBA)
+A function to increase stepping force and output a larger deceleration corresponding to danger of collision with vehicle travelling ahead in case brake is stepped on and deceleration of ego vehicle is larger than a certain value, in order to reduce collision speed or to avoid a collision.
+※ With spec TYPE MFL, this function is disabled.
+
+4) Brake pre-fill (Prefill)  
+The pump is activated beforehand to ensure quicker response to the pressure-increase request. Also the brake pressure is slightly raised. As a result, a clearance between the brake pad and rotor is reduced, which ensures brake’s good initial response.  
+※ With spec TYPE MFL, this function is disabled.
+
+3.3	Requirements
+This document covers specifications for 「AEB System OFF by user」, 「System State Judgment (including Failure Diagnosis)」, 「Notification of System Failure condition (Irreversible Failure) satisfied, System OFF, System Failure condition (Reversible Failure) satisfied」, 「Warning Control (CAN Output Value)」.   
+In addition, processing of CAN signals sent/received by the AEB ECU is also defined.  
+For acknowledgement of target objects, warning, and brake control of the AEB ECU, the specifications defined by Bosch shall apply.
+ 
+4.	Function requirements
+4.1	Determination of system status
+The AEB ECU determines the system status by checking if the driver turns off the system and if failure is detected or not. Then, the ECU carries out control appropriate for the determined system state, and sends the status data as CAN signal, “AEB System Failure Status”.
+
+4.1.1.	State transition and definition
+The state is determined on the basis of the following state transition chart.
+ 
+
+※ Transition to IG-OFF is enabled in any state.
+
+
+
+
+
+
+
+
+
+Definition of each status is shown as below.
+・	IG-OFF
+The IG is turned off.  
+As powered only from the IG, the AEB ECU does not work in this state.  
+However, this state is defined, so that transition to the system activation state through IG operation can be visible.
+
+・	Initial check
+Failure diagnosis of the AEB system is carried out immediately after IG-ON. 
+Warning Control, Brake Control are not operated.  
+During the initial check, turn ON AEB Failure W/L, AEB Operation Indicator, AEB OFF Indicator and transmit “AEB System Failure Status" = $1(Temporarily Failed). 
+See 4.1.2 for requirement details of AEB Failure W/L, AEB Operation Indicator and AEB OFF Indicator. 
+
+・	System ON
+System failure is not detected. 
+Warning Control, Brake Control are enable. 
+In this state, "AEB System Failure Status" = $0(No Failure) is transmitted.
+
+・	System OFF
+The driver turns off the AEB system through operation of the AEB OFF switch or turn off the ESP system through operation of the ESP OFF switch. 
+Warning Control, Brake Control are not operated. 
+The system also turns back to ON by driver selection.   
+In this OFF state, "AEB System Failure Status" = $1(Temporarily Failed) is transmitted.
+※ With spec TYPE MFL, “system OFF” status is unavailable. It should not change to this status.
+
+・	System ON and temporary deactivation
+The system is temporarily deactivated due to System Failure condition (Reversible Failure) being satisfied, which is judged by AEB ECU.
+Warning Control, Brake Control are not operated.  
+The system automatically turns to ON if the temporary deactivation conditions are no longer met.  
+In this state, "AEB System Failure Status" = $1(Temporarily Failed) is transmitted.
+
+
+
+
+
+
+
+・	System OFF and temporary deactivation
+The system is temporarily deactivated due to System Failure condition (Reversible Failure) being satisfied (which is judged by AEB ECU), and the driver disables the system through the switch operation.   
+Warning Control, Brake Control are not operated 
+If the temporary deactivation conditions are no longer met, the system automatically turns to the OFF state.
+In this state, "AEB System Failure Status" = $1(Temporarily Failed) is transmitted.
+※ With spec TYPE MFL, “System OFF and temporary deactivation” state is disabled, thus the system shall not change this state.
+
+・	Warning / brake control
+When any of conditions of Warning Control, Brake Control is met.
+If only Warning Control was active, after control cancelling the system shall shift to System ON state. If there was only one of automatic brake control, brake assist control or brake prefill control was active, after these controls cancelling the system shall shift to Brake Control Terminate state.
+See 4.1.2 for Transition condition details. 
+If transfer to the system OFF state, system ON and temporary deactivation state, or system failure state is required, the control request shall be ignored, and the system status shall be transferred.  
+In this state, "AEB System Failure Status" = $0(No Failure) is transmitted.
+
+・	Brake Control Terminate
+To prevent the brake control from continuous brake action, once brake control request has end, brake control request has to be prohibited.
+After elapsing the specified time, the system should shift automatically to system ON state.
+See 4.1.2 for Transition condition details.
+In this state, "AEB System Failure Status" = $0 (No Failure) is transmitted.
+※ With spec TYPE MFL, Brake Control(Auto Brake Control, Warning Brake Control, Brake Assist Control, Brake Prefill Control) is unable, so “Brake Control Terminate” status is unavailable. It should not change to this status.
+
+・	System failure
+The system is not working normally because System Failure condition (Irreversible Failure) is met due to failure of the AEB ECU itself, ECU of related components, and/or communication.
+Warning Control, Brake Control are not operated and Buzzer is disable. 
+The system turns to other states only after IG reset.    
+In this state, "AEB System Failure Status" = $2(Permanently Failed) is transmitted.
+
+
+
+
+
+Other Function Operation when Any Function Operating
+
+Operation, Deactivation judgment for other function while a part of functions in AEB ECU operating must be followed to table below.
+As pre-condition, Functions in column “Operating Function” are operated and defines Operation, Deactivation, Recovery Possibility for Functions in rows (FCW~EBA ACC) .
+
+Table: Combination List for Functions in AEB ECU. 
+※ Below is the definition for remarks in table.
+  ○: Do not stop function
+△: Function is terminated temporarily when condition is met but it is possible to recover in the same IG cycle.
+※ For YFA18MC, it is not necessary to refer this table.
+
+Operating Function	FCW	Prefill	AEB-P	AEB-L	EBA	ACC	TOR
+Normal state	○	○	○	○	○	○	○
+Initial Check	△	△	△	△	△	△	△
+Inspection completed mode	△	△	△	△	△	○	△
+ACC Operating	Main ON	○	○	○	○	○	○	△
+	Set ON	○	○	○	○	○	-	○
+FCW Operating	-	○	○	○	○	△	△
+Take over Request (TOR) Operating	○	○	○	○	○	△	-
+Prefill Operating	○	-	○	○	○	△	△
+Warning Brake (AEB-P) Operating	○	○	-	○	○	△	△
+Auto Brake (AEB-L) Operating	○	○	○	-	○	△	△
+Brake Assist Control (EBA) Operating	○	○	△	△	-	△	△
+ID2A2 “Brake Control Inhibit Status” = $3
+(Temporarily Inhibit (Driver’s Operation))	△	△	△	△	△	△	△
+AEB OFF SW ON	△	△	△	△	△	○	○
+
+
+See SUZUKI Information / Safety System Development Department Group 1 「ACC Control Requirement Specification」for “Take over Request” details.
+See Suzuki Information / Safety System Development Department, Group 4 「SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART2」for Inspection Completed mode. 
+4.1.2.	Conditions for state transition
+Conditions for the state transition shown in the figure are defined below.
+・	IG-ON
+The state transition takes place when the IG is turned on from the IG-OFF state.
+
+・	Completion of initial check
+The initial check shall be completed in 3.0sec after IG-ON.
+Time chart:
+
+ The IG is turned on at (1), and the initial check is started. 
+Start CAN transmission at (2) within 0.4s (400ms) after IG-ON at (1), turn on AEB Failure W/L, AEB Operation Indicator, AEB OFF Indicator and transmit "AEB System Failure Status" = $1(Temporarily Failed). 
+However, if a failure is not detected at (3) after elapsing 3.0s from IG ON, then complete initial check, turn off AEB Failure W/L, AEB Operation Indicator, AEB OFF Indicator and switch to System ON state. 
+※For Type MFL, AEB operation indicator, AEB OFF indicator and AEB System Failure Status shall normally be fixed at $0.
+
+
+
+
+If failure is detected during initial check as diagram below, then switch to system failure state and continue to turn on AEB Failure W/L, AEB Operation Display Lamp. Moreover, when it is not switched to Failure state then turn AEB OFF Display Lamp from ON → OFF until initial check is completed (elapsed 3.0s after IG ON)
+
+ 
+
+・	Judgment flag of pressed and held for AEB OFF switch set or reset
+The state transition triggered by driver’s pressing and holding of the AEB OFF switch.
+The AEB ECU determines switch operation on the basis of the AEB OFF switch information “AEB System SW from BCM” input via CAN. In case it is under “the AEB OFF switch long-pressed”, the judgment flag of pressed and held for AEB OFF switch sets “1” and resets “0”.
+For details of the switch pressed and held, see Clause 4.2.
+
+In case the system turns ON and either the judgment flag for AEB OFF switch flag or the following judgment flag for Brake Control Inhibit Status = $3 sets “1”, the system is transited to OFF
+
+In case the judgment flag for AEB OFF switch is set during the brake control, the system is transited to OFF.
+
+When IG ON, AEB shall be started with the state of System ON, instead of System OFF.
+
+In case the system turns OFF and either the judgment flag for AEB OFF switch flag and the following judgment flag for brake Control Inhibit Status = $3 sets “0”, the system is turned ON.
+※ With Type MFL, function of  "Judgment of pressed and held for AEB OFF switch" is unavailable. And "Judgment flag of pressed and held for AEB OFF switch" is set to reset value (fixed value).
+
+
+・	Brake Control Inhibit Status = $3 flag set or reset
+The state transition triggered by the driver’s action which turns off the ESP using ESP OFF SW.
+Judge the status of ESP by “Brake Control Inhibit Status” inputted via CAN and if $3(Temporarily Inhibit (Driver’s Operation)) was received, the judgment flag for Brake Control Inhibit Status = $3 is set. If $0(Normal) is received, the flag is reset to “0”.
+*For the case when Brake Control Inhibit Status = $3 is set and afterwards “Brake Control Inhibit Status” = $1 (Temporarily Inhibit) is received, system shall switch to [System OFF temporary] state as described in 「Temporarily Deactivation Condition Met / Not met」. Further, in case $2(Permanently Inhibit) is received, system should shift to [System error] state. Refer to 4.1.1 for system states.
+※ With spec TYPE MFL, Brake Control Inhibit Status = $3 flag is unavailable.
+And, Brake Control Inhibit Status = $3 flag is set to reset value (fixed value).
+
+(Additional) ESP ON / OFF judgment
+In case ESP gets turned off by driver, AEB system must shift to “System OFF” state and turn on “AEB OFF” Display Lamp and set “Multi-Display Information for AEB OFF” = $1 (Request)
+The ESP ON/OFF status achieved by driver’s switch operation is determined on the basis of the "Brake Control Inhibit Status".
+
+※ With spec TYPE MFL, “AEB OFF” Display Lamp is held turned off.
+And, “Multi-Display Information for AEB OFF” is set to $0 (No Request) (fixed value).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+・	Temporary deactivation conditions, met or no longer met
+The AEB ECU has a function of temporarily deactivating the system itself on the basis of a state of the system itself or of information from other ECUs. The state is immediately transferred according to a result of judgment by this function.
+
+See 5.1 System Failure condition (Reversible Failure) to set condition in AEB ECU. 
+
+・	Failure occurrence
+If the AEB ECU detects on the basis of information from other ECUs that the unit itself is faulty or that system failure is occurring, the state transfer takes place.
+Failure occurrence shall be detected in all states, excepting IG-OFF.  Even if the system is already put into the faulty state according to the state transition conditions, the failure detection shall continue. 
+If failure occurrence is judged and system is shifted to failure state, then do not recover to normal in the same IG cycle, but shift to IG-OFF state.   
+Refer to 5.2 System Failure condition (Irreversible Failure) to set in AEB ECU. 
+
+・	IG-OFF 
+The system is transferred to the IG-OFF state immediately after the IG is turned off.
+
+・	Warning/brake control request, met.
+If conditions for one of the warning control, automatic brake control, warning brake control, brake assist control and brake pre-fill control are met, the system is transferred to this state. At that time, “4.4.1 Activate condition of Warning control and Brake control” shall be met.
+※ With spec TYPE MFL, warning control is only able, so "Brake control request, met" is unavailable condition.
+
+・	Warning request cancelled
+State shift will happen if AEB ECU warning control request is canceled.
+But in case a brake control request is active at the same time as the warning control, it will not shift according to "warning request canceled" condition but according to "Brake control request canceled" condition.
+
+・	Brake control request cancelled
+If all of the following requests are cancelled state shift will happen.
+- Automatic Brake Control
+- Warning Brake Control
+- Brake Assist Control
+- Brake Prefill Control
+※ With spec TYPE MFL, Brake Control(Auto Brake Control, Warning Brake Control, Brake Assist Control, Brake Prefill Control) is unable, so “Brake control request cancelled” is unavailable condition.
+4.2	Driver’s AEB-OFF Function
+As mentioned before, the AEB system is disabled through driver’s pressing and holding of the AEB OFF switch. The AEB ECU acknowledges the switch is pressed and held, as follows. The judgment flag of pressed and held for AEB OFF switch is set to initial value at “0” and every time the judgment of pressed and held is reached, the flag is set “1” and reset to “0”.
+
+When both of the following conditions are met, it is determined that the AEB OFF switch is pressed and held.
+a)	“Lost Communication With BCM” is not met. (※)
+b)	"AEB System Switch Status from BCM" from BCM is changed from $0(False) to $1(True), and stays at $1(True) for【SW_jdg_time】or longer.
+
+The following shows an example of the switch input acknowledgement processes.
+ 
+At (1) shown above, "AEB System SW from BCM" turns from $0 to $1. 
+
+The AEB ECU measures duration when the signal stays at $1 from (1), and the switch input is acknowledged only after a lapse of 【SW_jdg_time】((2) shown above).  
+If communication interrupts during reception of "AEB System Switch Status from BCM" = $1(True) from BCM, the processing shall be continued on the basis of the previous value ($1). It is determined that System Failure condition (Irreversible Failure) is satisfied, if the "Lost Communication With BCM" conditions are met due to communication interrupt.
+※ For “Lost Communication With BCM”, see Chapter 5.
+※ With spec TYPE MFL, the AEB OFF switch input is always set to $0(fixed value).
+
+ 
+4.3	Notification of System OFF due to the driver, System Failure condition (Irreversible Failure) satisfied, System Failure condition (Reversible Failure) satisfied, Warning/Brake Control activation
+
+4.3.1.	Buzzer Blowing Conditions
+AEB system has functions that can notify the driver about System OFF due to driver, system failure, temporary deactivation, warning / brake control activation, by buzzer blowing and instrument panel displaying such as lighting, blink of AEB Failure Warning Lamp, AEB Operation Lamp and AEB OFF lamp.
+Buzzer shall blow with each state transition, according to the table below.
+However, for buzzer blowing request during operation of Warning / Brake control, follow “Buzzer blowing request when Warning / Brake control is operating”, described in chapter “Notification requirement when Warning / Brake control is operating”.
+
+Buzzer	State of control after transition
+	IG OFF	Initial check	System ON	System OFF	System ON temporary de-activation	System OFF temporary de-activation	Warning / Brake control is operating	Brake control ended	System failure
+State of control before transition	IG OFF		Not blow							
+	Initial check	Not blow		Not blow						Not blow
+	System ON	Not blow			Single tone (one time) ※1	Not blow		Intermittent tone continuously ※2		Not blow
+	System OFF	Not blow		Single tone (one time) ※1			Not blow			Not blow
+	System ON temporary deactivation	Not blow		Not blow			Not blow			Not blow
+	System OFF temporary deactivation	Not blow			Not blow	Not blow				Not blow
+	Warning / Brake control is operating	Not blow		Not blow	Single tone (one time) ※1	Not blow			Not blow	Not blow
+	Brake control ended	Not blow		Not blow	Single tone (one time) ※1	Not blow				Not blow
+	System failure	Not blow								
+	※1 Not blow on TYPE MFL
+	※2 For buzzer blowing request, follow “Buzzer blowing request when Warning / Brake control is operating”, described in chapter “Notification requirement when Warning / Brake control is operating”.
+When the current control state is “Warning / Brake control operating”, the buzzer shall blow, AEB Operation Lamp shall blink or braking maneuver request shall be displayed on multi-display, according to operation state of the function.
+
+Also, when Warning Control, Autonomous Brake Control, Warning Brake Control and Brake Assist Control are activated at the same time as Brake Prefill Control, the buzzer shall blow, AEB Operation Lamp shall blink, and braking request information shall be displayed on multi-display, according to Warning / Brake control function.
+With Spec Type MFL, even when any of Forward Collision Warning Control (FCW Stationary), Autonomous Brake Control, Brake Assist Control, Warning Brake Control or Brake Prefill Control has the activate condition met, the buzzer shall “not blow”, braking maneuver request information shall be “not displayed” and AEB Operation Lamp shall be set to be “OFF”.
+With Spec Type MFL, if activate condition of Forward Collision Warning Control (FCW Moving) is met, the buzzer shall blow with “Intermittent tone 1 continuously”, braking maneuver request information shall be “not displayed” and AEB Operation Lamp shall be set to be “OFF”.
+
+Brake control operating	Buzzer
+	TYPE MRR	TYPE MFL
+Forward Collision Warning Control (FCW Stationary)	Intermittent tone 1 continuously	Not blow
+Forward Collision Warning Control (FCW Moving)	Intermittent tone 1 continuously	Intermittent tone 1 continuously
+Autonomous Brake Control	Intermittent tone 1 continuously	Not blow
+Until the brake releasing after stopping	Intermittent tone 1 continuously	Not blow
+Brake Assist Control	Intermittent tone 1 continuously	Not blow
+Warning Brake Control	Intermittent tone 1 continuously	Not blow
+Brake Prefill Control	Not blow	Not blow
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3.2.	Indicator Display Request when System Failure condition is met
+Indicator Display Request when System Failure condition (Reversible Failure) is met
+If the System Failure condition (Reversible Failure) defined in Suzuki Information / Safety System Development Department – Group 1’s “ACC_AEB_Failure Diagnosis_requirement (RB_ACC)” is met, the following Indicator Display request shall be sent according to failure content. As AEB system, Buzzer Blowing shall not be requested.
+
+DTC	Content	ID 3A7 "AEB Failure
+Warning Request"	ID 3A7 "AEB Operation Indicator Request"	ID 3A7 "AEB Not Active
+Warning Request"
+		 	 	 
+C1603	AEB Variant is not confirmed	$0	$0	$0
+C1604	AEB Variant is not prescribed	$0	$0	$0
+C1610	Aiming is not completed	$2
+※1	$1
+※1	$0
+C1650	Steering Angle offset threshold exceeded	$2
+※1	$1
+※1	$0
+C1651	Yaw Rate offset threshold exceeded	$2
+※1	$1
+※1	$0
+C1652	Estimated tire size exceeds threshold	$2
+※1	$1
+※1	$0
+C1653	Unavailable reference velocity	$2
+※1	$1
+※1	$0
+C1654	Unavailability of yaw rate quality due to learning phase	$2
+※1	$1
+※1	$0
+C1655	Yaw Rate Compensation Temporary Failed	$2
+※1	$1
+※1	$0
+C1658	TCM Abnormal	$2
+※1	$1
+※1	$0
+C1659	Cruise Control Disabled from ECM DTC not stored	$2
+※1	$1
+※1	$0
+C1640	Temporary Deactivation Condition	Abnormal Temperature detected	$2
+※1	$1
+※1	$0
+		AEB ECU Power Voltage is out of operation range	$2
+※1	$1
+※1	$0
+		“Brake control inhibit status” = $1 ( Temporarily Inhibit ) is received	$2
+※1	$1
+※1	$0
+		”Outside Air Temperature Validity” = $1( Invalid) is received	$2
+※1	$1
+※1	$0
+		Blindness detected	$2
+※1	$1
+※1	$1
+※1
+※1: Be fixed $0 for Type MFL
+
+
+Indicator Display Request when System Failure condition (Irreversible Failure) is met
+If the System Failure condition (Irreversible Failure) defined in Suzuki Information / Safety System Development Department – Group 1’s “ACC_AEB_Failure Diagnosis_requirement (RB_ACC)” is met, the following Indicator Display request shall be sent according to failure content. As AEB system, Buzzer Blowing shall not be requested.
+
+DTC	Content	ID 3A7 "AEB Failure
+Warning Request"	ID 3A7 "AEB Operation Indicator Request"	ID 3A7 "AEB Not Active
+Warning Request"
+		 	 	 
+C1600	AEB ECU Failure	$2
+※1	$1
+※1	$0
+C1618	Millimeter wave Radar axle gap	$2
+※1	$1
+※1	$0
+C1620	CAN Invalid Data from ECM	$2
+※1	$1
+※1	$0
+C1621	CAN invalid data from TCM	$2
+※1	$1
+※1	$0
+C1630	ABS/ESP Transmission CAN Data Abnormal	$2
+※1	$1
+※1	$0
+C1631	SAS Transmission CAN Data Abnormal	$2
+※1	$1
+※1	$0
+C1633	MFL Transmission CAN Data Abnormal	$0	$0	$0
+C1638	AEB System Switch ON Stuck Abnormal	$2
+※1	$1
+※1	$0
+C1639	ESP Detection AEB Communication Failure	$2
+※1	$1
+※1	$0
+C1656	Cruise Control Disabled from HCU DTC stored	$2
+※1	$1
+※1	$0
+C1657	Cruise Control Disabled from HCU DTC not stored	$2
+※1	$1
+※1	$0
+※1: Be fixed $0 for Type MFL
+
+
+
+
+
+
+
+
+
+DTC	Content	ID 3A7 "AEB Failure
+Warning Request"	ID 3A7 "AEB Operation Indicator Request"	ID 3A7 "AEB Not Active
+Warning Request"
+		 	 	 
+U0073	Control Module Communication Bus Off	$2
+※1	$1
+※1	$0
+U0100	Lost Communication With ECM / PCM	$2
+※1	$1
+※1	$0
+U0101	Lost Communication With TCM	$2
+※1	$1
+※1	$0
+U0121	Lost Communication With ABS Control Module	$2
+※1	$1
+※1	$0
+U0126	Lost Communication With Steering Angle Sensor Module	$2
+※1	$1
+※1	$0
+U0140	Lost Communication With BCM	$2
+※1	$1
+※1	$0
+U0155	Lost Communication With IPC	$2
+※1	$1
+※1	$0
+U0293	Lost Communication With Hybrid Powertrain Control Module	$2
+※1	$1
+※1	$0
+U1082	Lost Communication With ICM	$2
+※1	$1
+※1	$0
+U1093	Lost Communication With MFL	$0	$0	$0
+※1: Be fixed $0 for Type MFL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3.3.	Multi-Display Request when System Failure condition is met
+Multi-Display Request when System Failure condition (Reversible Failure) is met
+If the System Failure condition (Reversible Failure) defined in Suzuki Information / Safety System Development Department – Group 1’s “ACC_AEB_Failure Diagnosis_requirement (RB_ACC)” is met, the following Multi-Display request shall be sent according to failure content. 
+
+DTC	Content	ID 3A7 "Multi-Display Information for AEB Temporary Inhibition"	ID 3A7 "Multi-Display Information for AEB Malfunction"	ID 3A7 "Multi-Display Information for Radar Dirty"
+C1603	AEB Variant is not confirmed	$0	$0	$0
+C1604	AEB Variant is not prescribed	$0	$0	$0
+C1610	Aiming is not completed	$1	$0	$0
+C1650	Steering Angle offset threshold exceeded	$1	$0	$0
+C1651	Yaw Rate offset threshold exceeded	$1	$0	$0
+C1652	Estimated tire size exceeds threshold	$1	$0	$0
+C1653	Unavailable reference velocity	$1	$0	$0
+C1654	Unavailability of yaw rate quality due to learning phase	$1	$0	$0
+C1655	Yaw Rate Compensation Temporary Failed	$1	$0	$0
+C1658	TCM Abnormal	$1	$0	$0
+C1659	Cruise Control Disable from ECM DTC not stored	$1	$0	$0
+C1640	Temporary Deactivation Condition	Abnormal Temperature detected	$1	$0	$0
+		AEB ECU Power Voltage is out of operation range	$1	$0	$0
+		“Brake control inhibit status” = $1 ( Temporarily Inhibit ) is received	$1	$0	$0
+		”Outside Air Temperature Validity” = $1( Invalid) is received	$1	$0	$0
+		Blindness detected	$1	$0	$1
+
+
+
+Multi-Display Request when System Failure condition (Irreversible Failure) is met
+If the System Failure condition (Irreversible Failure) defined in Suzuki Information / Safety System Development Department – Group 1’s “ACC_AEB_Failure Diagnosis_requirement (RB_ACC)” is met, the following Multi-Display request shall be sent according to failure content. 
+
+DTC	Content	ID 3A7 "Multi-Display Information for AEB Temporary Inhibition"	ID 3A7 "Multi-Display Information for AEB Malfunction"	ID 3A7 "Multi-Display Information for Radar Dirty"
+C1600	AEB ECU Failure	$0	$1
+※1	$0
+C1618	Millimeter wave Radar axle gap	$0	$1
+※1	$0
+C1620	CAN Invalid Data from ECM	$0	$1
+※1	$0
+C1621	CAN invalid data from TCM	$0	$1
+※1	$0
+C1630	ABS/ESP Transmission CAN Data Abnormal	$0	$1
+※1	$0
+C1631	SAS Transmission CAN Data Abnormal	$0	$1
+※1	$0
+C1633	MFL Transmission CAN Data Abnormal	$0	$0	$0
+C1638	AEB System Switch ON Stuck Abnormal	$0	$1
+※1	$0
+C1639	ESP Detection AEB Communication Failure	$0	$1
+※1	$0
+C1656	Cruise Control Disabled from HCU DTC stored	$0	$1
+※1	$0
+C1657	Cruise Control Disabled from HCU DTC not stored	$0	$1
+※1	$0
+
+
+
+
+
+
+
+
+
+DTC	Content	ID 3A7 "Multi-Display Information for AEB Temporary Inhibition"	ID 3A7 "Multi-Display Information for AEB Malfunction"	ID 3A7 "Multi-Display Information for Radar Dirty"
+U0073	Control Module Communication Bus Off	$0	$1
+※1	$0
+U0100	Lost Communication With ECM / PCM	$0	$1
+※1	$0
+U0101	Lost Communication With TCM	$0	$1
+※1	$0
+U0121	Lost Communication With ABS Control Module	$0	$1
+※1	$0
+U0126	Lost Communication With Steering Angle Sensor Module	$0	$1
+※1	$0
+U0140	Lost Communication With BCM	$0	$1
+※1	$0
+U0155	Lost Communication With IPC	$0	$1
+※1	$0
+U0293	Lost Communication With Hybrid Powertrain Control Module	$0	$1
+※1	$0
+U1082	Lost Communication With ICM	$0	$1
+※1	$0
+U1093	Lost Communication With MFL	$0	$0	$0
+※1: Be fixed $0 for Type MFL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Operation when Blindness is detected
+When Blindness is detected, the following value shall be set.
+　・ ID3A7 “Multi-Display Information for Radar Dirty” = $1( Request )
+　・ ID3A7 “Multi-Display Information for AEB Temporary Inhibition” = $1( Request )
+However, if 【BLINDNESSIPCTIME】 has passed since Blindness is detected, the following value shall be set.
+　・ ID3A7 “Multi-Display Information for Radar Dirty” = $0( NoRequest )
+　・ ID3A7 “Multi-Display Information for AEB Temporary Inhibition” = $0( NoRequest )
+
+【Particular process】
+While Blindness is being detected, if there is any failure that causes ID3A7 “Multi-display Information for AEB Temporary Inhibition” = $1( Request ) to be set, ID3A7 “Multi-Display Information for Radar Dirty” = $1 → $0 ( No Request ) shall be set.
+
+Concretely, the following behavior shall be executed.
+
+Explanation for operation when Blindness is detected
+
+ 
+
+
+
+
+
+Definition of Warning Lamp Request are shown as below.
+Term	Message	Display
+Warning lamp
+Request	ID3A7 “AEB Failure Warning Request” ※1	 
+	ID3A7 “AEB Operation Indicator Request”　　※1	 
+	ID3A7 “AEB Not Active Warning Request”　　※2	 
+※1 Not displayed on TYPE MFL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3.4.	Indicator Display Request when control conditions, excepting System Failure conditions, are met
+Indicator Display Request when Warning Control or Braking Control condition is met
+Following to “4.4 Control condition of Warning Control and Brake Control”, if Warning Control or Braking Control condition is met, the following Indicator Display request shall be sent according to control content.
+
+Content	ID 3A7 "AEB Operation Indicator Request"	ID 3A7 "Urging Brake Operation Indicator Request"
+	 	 
+Autonomous Brake Control (AEB-L) is in operation	$2
+※1	$1
+※1
+Warning Brake Control (AEB-P) is in operation	$2
+※1	$1
+※1
+Brake Prefill Control is in operation	$0	$0
+Forward Collision Warning Control (FCW) is in operation	$0	$1
+※1
+Brake Assist Control (EBA) is in operation	$2
+※1	$1
+※1
+※1: Be fixed $0 for Type MFL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Indicator Display Request in functional suppression condition
+If AEB System is OFF or in Inspection mode, the following Indicator Display request shall be sent according to control content.
+
+Content	ID 3A7 "AEB OFF
+Indicator Request"
+	 
+
+Inspection mode ※2	$1
+※1
+The flag ”Brake Control Inhibit Status” = $3 is set	$1
+※1
+The flag to determine whether AEB OFF Switch is being pressed and held is set	$1
+※1
+※1: Be fixed $0 for Type MFL
+※2: See Suzuki Information / Safety System Development Department, Group 4 Automobile Electronic & Electrical System Design Department, Group 5 「SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART2」 for Inspection mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3.5.	Multi-Display Request when control conditions, excepting System Failure conditions, are met
+Multi-Display Request when Warning Control or Braking Control condition is met
+Following to “4.4 Control condition of Warning Control and Brake Control”, if Warning Control or Braking Control condition is met, the following Multi-Display request shall be sent according to control content.
+
+Content	ID 3A7 "Multi-Display Information for Urging Brake Operation" ※2
+Autonomous Brake Control (AEB-L) is in operation	$1
+※1
+Warning Brake Control (AEB-P) is in operation	$1
+※1
+Brake Prefill Control is in operation	$0
+Forward Collision Warning Control (FCW) is in operation	$1
+※1
+Brake Assist Control (EBA) is in operation	$1
+※1
+※1: Be fixed $0 for Type MFL
+※2: After the buzzer completed blowing, this information’s displaying will be extended more 3.0s.
+
+
+
+
+
+
+
+
+
+
+
+
+Multi-Display Request in functional suppression condition
+If AEB System is OFF or in Inspection mode, the following Multi-Display request shall be sent according to control content.
+Content	ID 3A7 "Multi-Display Information for AEB OFF"
+Inspection mode ※2	$1
+※1
+”Brake Control Inhibit Status” = $3
+( Temporarily Inhibit, Driver’s Operation ) is received	$1
+※1
+Judgment flag (to determine whether AEB OFF Switch is being pressed and held) is set	$1
+※1
+※1: Be fixed $0 for Type MFL
+※2: See Suzuki Information / Safety System Development Department, Group 4 Automobile Electronic & Electrical System Design Department, Group 5 「SUZUKI SDL on CAN-KWP2000 SPECIFICATION PART2」 for Inspection mode.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.3.6.	Buzzer Blowing Requirements
+AEB/ACC ECU shall send blowing request of buzzer to IPC.
+Blowing patterns and the applied CAN signal sending content are shown as below.
+Request	Buzzer Request for AEB	Reference
+		Blowing pattern	Blowing period	Duty
+Not blow	$0 (No Request)
+Sent continuously	-	-	-
+Long sound	$1 (Malfunction)
+Sent for 1.0 sec	“peeee”
+one time	2.0 [s]	50 [%]
+Single tone	$2 (Information)
+Sent for 0.4 sec	“Peep”
+one time	0.8 [s]	25 [%]
+Intermittent tone 1	$3 (Warning1)
+Sent continuously	“peepeepeepeepee”
+continuously	0.2 [s]	50 [%]
+Intermittent tone 2	$4 (Warning2)
+Sent continuously	“peepeep peepeep”
+continuously	1.0 [s]	-
+
+CAN sending period is "Buzzer Request for AEB" and "Buzzer Request for ACC" is 100[ms].
+For long sound, $1 (Malfunction) is sent for 1.0 sec, making the buzzer blow one time with the pattern which period is 2.0[s] and Duty is 50[%].
+For single tone, $2 (Information) is sent for 0.4 sec, making the buzzer blow one time with the pattern which period is 0.8[s] and Duty is 25[%].
+While blowing request of single tone is being sent, even if another blowing request of single tone is set, transmission of $2 (Information) shall be ended after sending for 0.4 sec.
+While blowing request of single tone is being sent, if another blowing request of long sound is set, transmission of $2 (Information) shall be ended, and $1 (Malfunction) shall be started to send for 1.0 sec.
+
+For intermittent tone 1&2, in order to make the buzzer blow continuously when requested, $3 or $4 shall be sent continuously.
+If both Intermittent tone 1 and intermittent tone 2 receive blowing request at the same time, intermittent tone 1 shall be set as high priority and $3 shall be sent continuously.
+If both single tone / long sound and intermittent tone have blowing request at the same time, single tone or long sound shall be set as high priority and $1 or $2 shall be sent. However, after single tone / long sound blowing, if blowing request of intermittent tone is still being set, blowing request of intermittent tone shall be restarted.
+
+The figure below shows an example of relation between buzzer blowing and CAN signal transmission of blowing request.
+When IPC received blowing request signal, it shall make the buzzer blow for a certain period. Then, as the figure of “Single tone blowing”, after ending of blowing period, if another blowing request is being received, the buzzer shall blow for a certain period again.
+
+
+
+ 
+Long sound blowing
+ 
+Single tone blowing
+ 
+Intermittent tone 1
+ 
+Intermittent tone 2
+Warning lamp indication and Multi-display indication request details
+The AEB ECU requests to turn on W/L, Display Lamp equipped in IPC and multi-display. 
+The lamp ON and indication request pattern are given below with the according CAN signal transmit content.
+
+・	AEB Failure Warning
+This lamp notifies AEB System Failure condition (Irreversible Failure) satisfied, System Failure condition (Reversible Failure) satisfied.
+
+Control AEB Failure W/L (ID3A7“AEB Failure Warning Request”) and transmit CAN Signal according to table below.
+Request	AEB Failure Warning Request	Reference
+		Color	Blink cycle	Duty
+OFF	$0(No Indication)
+Sent continuously.	Amber	-	-
+Blink	$1(Flashing)
+Sent continuously.		1[s]	50[%]
+Blink	$2(Flashing)
+Sent continuously.		1[s]	50[%]
+※ With spec TYPE MFL, ID3A7“AEB Failure Warning Request”is set to $0(fixed value).
+The following chart shows relation between the CAN signal and blinking of the AEB failure warning lamp.
+ 
+
+
+
+
+
+
+
+
+
+・	AEB operation indication lamp (ID3A7"AEB Operation Indicator Request")
+
+Request	AEB Operation Indicator Request	Reference
+		Lamp color	Blinking cycle	Duty
+OFF	$0(No indication)
+Sent continuously.	Amber	-	-
+Blinking	$1(Continuous Indication)
+Sent continuously.		-	-
+Blinking	$2(Flashing)
+Sent continuously.		0.2[s]	50[%]
+※ With spec TYPE MFL, ID3A7“AEB Operation Indicator Request” is set to $0(fixed value).
+The graph below shows the relation between AEB operation indication CAN signal and the blinking.
+ 
+
+Warning timing switch function was abolished, thus ID3A7“AEB Warning Timing Far Indicator Request” = $0 shall be set to be fixed value.
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+・ SDR Request from AEB 
+When the brake control shown in the list below was activated, ID3A7 “SDR Request from AEB” = $1( Request ) shall be sent.
+Follow “SUZUKI CAN SPECIFICATION PART3” and “ACC_AEB_FailureDiagnosis_requirement(RB_ACC)” for the transmission method of ID3A7“SDR Request from AEB”.
+※ This function is applicable to YFA 18MC or later models.
+
+Brake control activation	SDR Request from AEB
+Forward Collision Warning (FCW Stationary)	○
+Forward Collision Warning Control (FCW Moving)	○
+Autonomous Braking Control 	○
+Brake Assist Control	○
+Warning Braking Control	○
+Brake Prefill Control	○
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.4	Control condition of Warning Control and Brake Control
+Activate condition, terminate condition of Warning brake control are shown as below.
+4.4.1.	Activate condition of Warning control and Brake control 
+Activate condition of Warning control and Brake control are shown as below.
+※For control function, follow 1.8 Spec Type.
+
+Forward Collision Warning Control (FCW) Stationary
+If all of the following conditions 1) ～ 5) are met, FCW Stationary shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) FCW suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+5) Spec type is TYPE MRR
+
+Forward Collision Warning Control (FCW) Moving
+If all of the following conditions 1) ～ 4) are met, FCW Moving shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) FCW suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+
+Autonomous Braking Control (AEB-L)
+If all of the following conditions 1) ～ 5) are met, AEB-L shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) AEB-L suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+5) Spec type is TYPE MRR
+
+Warning Braking Control (AEB-P)
+If all of the following conditions 1) ～ 5) are met, AEB-L shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) AEB-P suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+5) Spec type is TYPE MRR
+
+
+
+Brake Assist Control (EBA)
+If all of the following conditions 1) ～ 6) are met, EBA shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) EBA suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+5) Brake pedal is determined to be pressed
+　　ID318 “Brake Pedal Switch Active” = $1 (True)
+6) Spec type is TYPE MRR
+
+Brake Prefill Control
+If all of the following conditions 1) ～ 5) are met, Prefill shall be activated.
+1) AEB ECU determined that control target is being approached, and there is the risk of collision 
+2) Prefill suppression’s condition is not met 
+3) System Failure condition (Reversible Failure) is not met
+4) System Failure condition (Irreversible Failure) is not met
+5) Spec type is TYPE MRR
+
+4.4.2.	Terminate condition of Warning control and Brake control
+Terminate condition of Warning control and Brake control are shown as below.
+
+Forward Collision Warning Control (FCW) Stationary / Moving
+If any of the following conditions 1) ～ 4) is met, FCW Stationary / Moving shall be terminated.
+1) AEB ECU determined that there is not any risk of collision with control target 
+2) FCW cancel condition is met 
+3) System Failure condition (Reversible Failure) is met
+4) System Failure condition (Irreversible Failure) is met
+
+Autonomous Braking Control (AEB-L)
+If any of the following conditions 1) ～ 4) is met, AEB-L shall be terminated.
+1) AEB ECU determined that there is not any risk of collision with control target 
+2) AEB-L cancel condition is met 
+3) System Failure condition (Reversible Failure) is met
+4) System Failure condition (Irreversible Failure) is met
+
+
+
+
+
+Warning Braking Control (AEB-P)
+If any of the following conditions 1) ～ 4) is met, AEB-P shall be terminated.
+1) AEB ECU determined that there is not any risk of collision with control target 
+2) AEB-P cancel condition is met 
+3) System Failure condition (Reversible Failure) is met
+4) System Failure condition (Irreversible Failure) is met
+
+Brake Assist Control (EBA)
+If any of the following conditions 1) ～ 4) is met, EBA shall be terminated.
+1) AEB ECU determined that there is not any risk of collision with control target 
+2) EBA cancel condition is met 
+3) System Failure condition (Reversible Failure) is met
+4) System Failure condition (Irreversible Failure) is met
+
+Brake Prefill Control
+If any of the following conditions 1) ～ 4) is met, Prefill shall be terminated.
+1) AEB ECU determined that there is not any risk of collision with control target 
+2) Prefill cancel condition is met 
+3) System Failure condition (Reversible Failure) is met
+4) System Failure condition (Irreversible Failure) is met
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.4.3.	Suppression’s condition of Warning control and Brake control 
+This chapter defines suppression’s condition of every functions at transition time of System ON state  Warning/Brake control. Even when the system is in System ON state (failure is undetected), Warning control and Brake control shall not be started if the following conditions are not met.
+
+Forward Collision Warning Control (FCW) Stationary / Moving
+If any of the following conditions 1) ～ 11) is met, FCW Suppression’s condition shall be met.
+1) Initial check has not been completed
+2) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+3) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+4) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+
+
+
+
+
+
+
+
+
+
+5) ESP is active
+When ID3A1 “State of Stability Control Function” = $1 (Active), or during a period of 【ESPSPTFCW】 since the time $0 (Enabled) changed to $1 (Active).
+ 
+6) Blocking Timer is operating (Blocking Timer Operating Time = 【BTFCW】)
+　　※If the control is activated, it shall be prohibited for a period of 【BTFCW】(after starting to count from termination).
+7) Vehicle speed (estimated from ID1B8 “Wheel Speed” of 4 wheels) is outside “4.5.5 Speed range of Warning/Brake control operation”
+8) The driver turns off the AEB function (only TYPE MRR)
+9) Accelerator pedal is pressed with an inclination more than a certain degree
+　　ID122 “Accelerator Actual Position” > 【GASPRATEFCW】
+10) Steering wheel is manipulated (requesting avoidance)
+　　 Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　 ① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSFCW】｜
+and it passed within 【STANGLPSSFCW】from the time that Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) ≦｜【STANGLPSFCW】｜
+　　 ② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLFCW】｜
+and it passed within 【STANGLSFCW】from the time that ID119 “Steering Wheel Absolute Angle” ≦｜【STANGLFCW】｜
+
+※Blocking Timer means a function that suppresses Warning/Brake operation for a certain time after Warning/Brake operation.
+
+
+
+
+
+
+
+
+Autonomous Braking Control (AEB-L)
+If any of the following conditions 1) ～ 13) is met, AEB-L Suppression’s condition shall be met.
+1) Initial check has not been completed
+2) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+3) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+4) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+5) ESP is active
+When ID3A1 “State of Stability Control Function” = $1 (Active), or during a period of 【ESPSPTAEBL】 from the time that $1 (Active) changed to $0 (Enabled).
+6) Blocking Timer is operating (Blocking Timer Operating Time = 【BTAEBL】)
+　　※If the control is activated, it shall be prohibited for a period of 【BTAEBL】 (after starting to count from termination).
+7) The driver turns off the AEB function 
+8) Accelerator pedal is pressed in a certain degree or more
+　　ID122 “Accelerator Actual Position” > 【GASPRATEAEBL】
+9) Steering wheel is manipulated (requesting avoidance)
+　　 Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+①	 In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSAEBL】｜
+and it passed within 【STANGLPSSAEBL】from the time that Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) ≦｜【STANGLPSAEBL】｜
+
+　　 ② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLAEBL】｜
+and it passed within 【STANGLSAEBL】from the time that ID119 “Steering Wheel Absolute Angle” ≦｜【STANGLAEBL】｜
+10) Turning a curve more than 【CRAEBL】
+11) Hydraulic pressure in braking master cylinder is greater than a certain value
+　　 ID1AF “Master Cylinder Pressure” > 【MCPAEBL】 
+12) Vehicle speed (estimated from ID1B8 “Wheel Speed” of 4 wheels) is outside “4.5.5 Speed range of Warning/Brake control operation”
+
+
+Warning Braking Control (AEB-P)
+If any of the following conditions 1) ～ 12) is met, AEB-P Suppression’s condition shall be met.
+1) Initial check has not been completed
+2) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+3) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+4) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+5) ESP is active
+When ID3A1 “State of Stability Control Function” = $1 (Active), or during a period of 【ESPSPTAEBP】 from the time that $1 (Active) changed to $0 (Enabled).
+
+6) Blocking Timer is operating (Blocking Timer Operating Time = 【BTAEBP】)
+　　※If the control is activated, it shall be prohibited for a period of 【BTAEBP】(after starting to count from termination).
+7) The driver turns off the AEB function 
+8) Accelerator pedal is pressed in a certain degree or more
+　　ID122 “Accelerator Actual Position” > 【GASPRATEAEBP】
+9) Steering wheel is manipulated (requesting avoidance)
+　　 Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　 ① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSAEBP】｜
+and it passed within 【STANGLPSSAEBP】from the time that Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) ≦｜【STANGLPSAEBP】｜
+　　 ② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLAEBP】｜
+and it passed within 【STANGLSAEBP】from the time that ID119 “Steering Wheel Absolute Angle” ≦｜【STANGLAEBP】｜
+10) Accelerator pedal was pressed with a speed ≧ threshold
+Pressed with the speed ≧ 【GPG】
+and it passed within 【GPGS】from the time that the speed <｜【GPG】｜
+ 
+11) Vehicle speed (estimated from ID1B8 “Wheel Speed” of 4 wheels) is outside “4.5.5 Speed range of Warning/Brake control operation”
+
+
+
+
+
+
+
+Brake Assist Control (EBA)
+If any of the following conditions 1) ～ 13) is met, EBA Suppression’s condition shall be met.
+1) Initial check has not been completed
+2) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+3) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+4) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+5) ESP is active
+When ID3A1 “State of Stability Control Function” = $1 (Active), or during a period of 【ESPSPTEBA】 from the time that $1 (Active) changed to $0 (Enabled).
+6) Blocking Timer is operating (Blocking Timer Operating Time = 【BTEBA】)
+　　※If the control is activated, it shall be prohibited for a period of 【BTAEBA】 (after starting to count from termination).
+7) The driver turns off the AEB function 
+8) Accelerator pedal is pressed in a certain degree or more
+　　ID122 “Accelerator Actual Position” > 【GASPRATEEBA】
+9) Steering wheel is manipulated (requesting avoidance)
+　　 Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　 ① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSEBA】｜
+and it passed within 【STANGLPSSEBA】from the time that Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) ≦｜【STANGLPSEBA】｜
+　　 ② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLEBA】｜
+and it passed within 【STANGLSEBA】from the time that ID119 “Steering Wheel Absolute Angle” ≦｜【STANGLEBA】｜
+10) Hydraulic pressure in braking master cylinder is equal to smaller than a certain value or smaller.
+　　 ID1AF “Master Cylinder Pressure” ≦< 【MCPEBA】
+11) Vehicle speed (estimated from ID1B8 “Wheel Speed” of 4 wheels) is outside “4.5.5 Speed range of Warning/Brake control operation”
+12) Acceleration acquired from ID1B8 “Wheel Speed”, ID1EF “Acceleration Sensor Value” is larger than threshold
+　　 “Acceleration estimated value” ≧ 【AcceleratorEBA】
+
+
+
+Brake Prefill Control
+If any of the following conditions 1) ～ 11) is met, Prefill Suppression’s condition shall be met.
+1) Initial check has not been completed
+2) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+3) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+4) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+
+5) ESP is active
+When ID3A1 “State of Stability Control Function” = $1 (Active), or during a period of 【ESPSPTPF】 from the time that $1 (Active) changed to $0 (Enabled).
+6) Blocking Timer is operating (Blocking Timer Operating Time = 【BTPF】)
+　　※If the control is activated, it shall be prohibited for a period of 【BTPF】(after starting to count from termination).
+7) Vehicle speed (estimated from ID1B8 “Wheel Speed” of 4 wheels) is outside “4.5.5 Speed range of Warning/Brake control operation”
+8) The driver turns off the AEB function 
+9) Accelerator pedal is pressed in a certain degree or more
+　　ID122 “Accelerator Actual Position” > 【GASPRATEPF】
+10) Steering wheel is manipulated (requesting avoidance)
+　　 Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　 ① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSPF】｜
+and it passed within 【STANGLPSSPF】from the time that Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) ≦｜【STANGLPSPF】｜
+　　 ② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLPF】｜
+and it passed within 【STANGLSPF】from the time that ID119 “Steering Wheel Absolute Angle” ≦｜【STANGLPF】｜
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4.4.4.	Cancel condition of Warning control and Brake control’s operation
+When operating in state of Warning/Brake control, if the following cancel conditions are met, Warning control and Brake control shall be cancelled. Transition states after cancellation are different according to cancel conditions.
+
+Forward Collision Warning Control (FCW) Stationary / Moving
+If any of the following conditions 1) ～ 2 3) is met, FCW shall be cancelled.
+1) The driver turned off the AEB function (only TYPE MRR)
+2) Only FCW was operated continuously for 【CANTIMEFCW】 or more
+
+Autonomous Braking Control (AEB-L)
+If any of the following conditions 1) ～ 8) is met, AEB-L cancel condition shall be met.
+1) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+2) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+3) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+4) The driver turned off the AEB function 
+5) AEB-L was operated continuously for 【CANTIMEAEBL】or more
+6) ESP is active
+　 ID3A1 “State of Stability Control Function” = $1 (Active) was received continuously for 【ESPSPTCAEBL】.
+7) Steering wheel is manipulated (requesting avoidance)
+　　Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSCAAEBL】｜
+　　② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLCAAEBL】｜
+8) Driver Override condition is met
+　　Driver Override is determined if satisfying any of the following conditions ① ～ ④.
+① Accelerator pedal is pressed suddenly
+Inclination of accelerator pedal changes to 【GASPRATECAAEBL】or greater for 【GASPRATESCAAEBL】.
+② Accelerator pedal is pressed again
+When ID122 “Accelerator Actual Position” is inside the range of 【GASPRATECAMINAEBL】～ 【GASPRATECAMAXAEBL】, it changed from 【GASPRATECAAEBL1】(or less) to 【GASPRATECAAEBL2】(or greater) within after a period of 【GASPRATECASAEBL】.
+③ The driver pressed accelerator pedal after releasing brake pedal; or brake pedal and accelerator pedal are pressed at the same time
+After or while ID318 “Brake Pedal Switch Active” = $1 (True), 
+ID122 “Accelerator Actual Position” > 【GASPRATECAAEBL3】
+④ Accelerator pedal was pressed continuously with an inclination ≧ the certain value
+ID122 “Accelerator Actual Position” = 【GASPRATECAMAXAEBL】 is received continuously for 【GASPRATETAEBL】.
+
+
+Warning Braking Control (AEB-P)
+If any of the following conditions 1) ～ 9) is met, AEB-P cancel condition shall be met.
+1) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+2) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+3) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+4) The driver turned off the AEB function 
+5) AEB-P was operated continuously for 【CANTIMEAEBP】or more
+6) ESP is active
+　 ID3A1 “State of Stability Control Function” = $1 (Active) was received continuously for 【ESPSPTCAEBP】.
+7) Steering wheel is manipulated (requesting avoidance)
+　　Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSCAEBP】｜
+　　② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLCAEBP】｜
+8) Driver Override condition is met
+　　Driver Override is determined if satisfying any of the following conditions ① ～ ④.
+① Accelerator pedal is pressed suddenly
+Inclination of accelerator pedal changes to 【GASPRATECAAEBP】or greater for 【GASPRATESCAAEBP】.
+② Accelerator pedal is pressed again
+When ID122 “Accelerator Actual Position” is inside the range of 【GASPRATECAMINAEBP】～ 【GASPRATECAMAXAEBP】, it changed from 【GASPRATECAAEBP1】(or less) to 【GASPRATECAAEBP2】(or greater) within after a period of 【GASPRATECASAEBP】.
+③ The driver pressed accelerator pedal after releasing brake pedal; or brake pedal and accelerator pedal are pressed at the same time
+After or while ID318 “Brake Pedal Switch Active” = $1 (True), 
+ID122 “Accelerator Actual Position” > 【GASPRATECAAEBP3】
+④ Accelerator pedal was pressed continuously with an inclination ≧ the certain value
+ID122 “Accelerator Actual Position” = 【GASPRATECAMAXAEBP】is received continuously for 【GASPRATETAEBP】.
+9) Vehicle speed difference caused by AEB-P control is more than 【REVSAEBP】 
+(in case that control target is Moving Object)
+
+Brake Assist Control (EBA)
+If any of the following conditions 1) ～ 11) is met, EBA cancel condition shall be met.
+1) Stability Control is in control prohibited state
+　　ID3A1 “State of Stability Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation)) 
+　　is being received.
+2) Traction Control is in control prohibited state
+　　ID3A1 “State of Traction Control Function” = 	$2 (Disabled (Failed)),
+	$3 (Disabled (Maintenance)),
+	$4 (Disabled (Reversible)),
+	$5 (Disabled (Driver’s Operation))
+　　is being received.
+3) The ego vehicle is determined to be in Pulled State (in case of AT)
+　　Pulled State is determined if satisfying all of the following conditions ① ～ ②.
+　　① Hazard lamp is ON
+　　　　※ Hazard lamp ON state is determined as follows.
+　　　　・ Both ID3D0 “Turn Right On” and ID3D0 “Turn Left On” repeat with $1 (Indication and Buzzer On) then $0 (Indication and Buzzer Off) at the same time. Furthermore, time for transition ($1→$0→$1...) of each signal shall be repeated with Period: 700ms / Duty: 52 50% / Tolerance: +5%.
+　　② Gear position is “N” (in case of AT)
+　　　　ID380 “TM Gear Selector Position” = $9 (Neutral)
+4) The driver turned off the AEB function 
+5) EBA was operated continuously for 【CANTIMEEBA】ms or more
+6) Steering wheel is manipulated (requesting avoidance)
+　　Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSCEBA】｜
+　　② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLCEBA】｜
+7) ID122 “Accelerator Actual Position” >≧ 【GASPRATECAEBA4】
+8) Target deceleration is equal to a certain value or greater.
+　　 ID0FA “Target Acceleration” > 【REVSEBA】
+9) Brake pedal was released
+　　 ID318 “Brake Pedal Switch Active” = $0 (False)
+
+
+
+Brake Prefill Control
+If any of the following conditions 1) ～ 4) is met, Prefill cancel condition shall be met.
+1) The driver turned off the AEB function 
+2) Prefill was operated continuously for 【ESPSPTAPF】or more
+3) ESP is active
+　 ID3A1 “State of Stability Control Function” = $1 (Active) was received continuously for 【ESPSPTCPF】.
+4) Steering wheel is manipulated (requesting avoidance)
+　　Steering manipulation is determined if satisfying any of the following conditions ① ～ ②.
+　　① In case that Steering wheel was turned suddenly
+Angular Velocity (calculated from ID119 “Steering Wheel Absolute Angle”) >｜【STANGLPSCPF】｜
+　　② In case that Steering wheel was turned at a degree ≧ the certain value
+ID119 “Steering Wheel Absolute Angle” >｜【STANGLCPF】｜
+
+4.4.5.	Speed range of Warning/Brake control operation
+When the system is in System ON state, in order for transition of Warning/brake control, the vehicle is needed to satisfy the following speed conditions.
+
+Control function	Control target	Minimum speed [km/h]	Maximum speed [km/h]
+FCW	Stationary Object	【FCWSOMINKPH】	【FCWSOMAXKPH】
+	Moving Object	【FCWMOMINKPH】	【FCWMOMAXKPH】
+Prefill	Stationary Object	【PFSOMINKPH】	【PFSOMAXKPH】
+	Moving Object	【PFMOMINKPH】	【PFMOMAXKPH】
+AEB-P	Stationary Object	-	-
+	Moving Object	【AEBPMOMINKPH】	【AEBPMOMAXKPH】
+AEB-L	Stationary Object	【AEBLSOMINKPH】	【AEBLSOMAXKPH】
+	Moving Object	【AEBLMOMINKPH】	【AEBLMOMAXKPH】
+EBA	Stationary Object	【EBASOMINKPH】	【EBASOMAXKPH】
+	Moving Object	【EBAMOMINKPH】	【EBAMOMAXKPH】
+
+※Stationary Object is the control target that is determined to be standing still.
+　 Moving Object is the control target that is determined to be moving.
+
+
+
+
+
+
+
+
+
+
+
+
+4.5	Other requirements
+4.5.1.	CAN Signal Transceiver Process
+The CAN signals which the AEB ECU sends, receives and has to process, are defined below.
+
+1)	Outside temperature
+The outside temperature is input with the following two signals:
+"Outside Air Temperature"
+"Outside Air Temperature Validity"
+
+If a combination of the two signals is either of the following 1 or 2, the input data on the outside temperature shall be ignored, and then, the default value shall be used for the processing.
+
+Combination 1 (Outside sensor failure or sensor not equipped)
+"Outside Air Temperature" = *(Not prescribed)
+"Outside Air Temperature Validity" = $1(Invalid)
+
+Combination 2 (Manual Air-condition car)
+"Outside Air Temperature" = $0000
+"Outside Air Temperature Validity" = $0(Valid)
+
+Combination 1:  The outside temperature sensor is faulty, or it is found through the sensor equipment check that the sensor is not equipped.  
+Combination 2:  The outside temperature sensor is not provided, and the sensor equipment check is not conducted.
+
+2)	Brake control request
+The CAN signal shall be assigned as follow if requirements of Brake Control are met.  
+For details of the CAN ID and transmission cycle, see “SUZUKI CAN SPECIFICATION PART2” and “SUZUKI CAN SPECIFICATION PART3”.
+
+① Automatic brake control (AEB-L)
+While the automatic brake control requirements are met, the automatic brake request flag, which is at $1, and the automatic brake request deceleration, which has a request value, shall be sent.
+Auto Brake Control Request	Auto Brake Request flag
+(AEB-L)	Warn Brake Request flag
+(AEB-P)	Auto Brake Request Deceleration
+	AEB Brake Control Request	AEB Partial Brake Control Request	AEB Target Deceleration
+Met	$1(True)	$0	$0 ~ $FFFF(-655.35 ~ 0[m/s2])
+Not met	$0(False)	$0	$FFFF(0[m/s2])
+※	With spec TYPE MFL, this function is disabled and Auto Brake Control Requirement is always not met.
+
+② Warning Brake Control (AEB-P)
+When Warning Brake Control requirements are met, then transmit Warn Brake Request Flag = $1 and also set the requested value into Auto Brake Request Deceleration to send. 
+Auto Brake Control Request	Auto Brake Request flag
+(AEB-L)	Warn Brake Request flag
+(AEB-P)	Auto Brake Request Deceleration
+	AEB Brake Control Request	AEB Partial Brake Control Request	AEB Target Deceleration
+Met	$0(False)	$1(True)	$0 ~ $FFFF(-655.35 ~ 0[m/s2])
+Not met	$0(False)	$0(False)	$FFFF(0[m/s2])
+※	With spec TYPE MFL, this function is disabled and Auto Brake Control Requirement is always not met.
+
+③ Brake Assist Control (EBA)
+During Brake Assist Control request, send Brake Assist Control Request Flag = $1 and set the requested value into Auto Brake Request Deceleration to send. 
+Brake Assist Control Request	Brake Assist Request Flag	Auto Brake Request Deceleration
+	AEB BA Control Request	AEB Target Deceleration
+Met	$1(True)	$0 ~ $FFFF (-655.355 ~ 0[m/s2])
+Not met	$0(False)	$FFFF (0[m/s2])
+※	With spec TYPE MFL, this function is disabled and Brake Assist Control Requirement is always not met.
+
+④ Brake pre-fill Control (Prefill)
+When Brake Pre-fill Control requirements are met, then set Brake Pre-fill Request flag = $1 and send. 
+Brake Prefill Control Requirements	Brake pre-fill request flag
+	AEB Prefill Control Request
+Met	$1 (True)
+Not met	$0 (False)
+※	With spec TYPE MFL, this function is disabled and Brake Prefill Control Requirement is always not met.
+
+3)	Output of data detected by AEB ECU sensor
+The object data which are detected by AEB ECU radar have to be sent. 
+For details about the data to send, CAN ID and transmission cycle, see “SUZUKI CAN SPECIFICATION PART2” and “SUZUKI CAN SPECIFICATION PART3”.
+
+4.5.2.	Inhibition of controlling for Small Moving Object (SMO)
+When detecting a target object being a SMO, the system shall not execute Warning control and Brake control. For SMO detection condition, conform to supplier’s specification.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5.	Failure diagnosis
+5.1	System Failure condition (Reversible Failure)
+
+See SUZUKI Information / Safety System Development Department Group1 - 「AEB ACC Failure Diagnosis Specification」 for details.
+
+5.2	System Failure condition (Irreversible Failure)
+
+See SUZUKI Information / Safety System Development Department Group1 - 「AEB ACC Failure Diagnosis Specification」for System failure (Irreversible Failure) judgment condition and others.
+ 
+6.	Revision History
+Ver. Draft
+(Date: 2013/10/28  Author: 三井)
+Chapter	Update content	Page
+-	New 	All pages
+
+Ver. 1.0
+(Date:  2014/03/04  Author: 三井)
+Chapter	Update content	Page
+-	Describe AEB Failure W/L as reference information
+Change AEB Operation Indicator, AEB OFF Indicator ON request 	All page with description of W/L, Indicator
+1	Add content 「This spec is only applied for YAA, YFA for oversea」	3
+1.3	Add 「1.3 Related regulation and Technical Guideline」	4
+2.1 	Add TCM into system configure	5
+3.1	Add TCM into system configure diagram	7
+4.1.1	Add transition from 「Brake Control Terminate」state → 「system OFF」, 「system ON temporarily deactivation」state into state transition diagram and transition condition in 「system ON temporarily deactivation」「system OFF temporarily deactivation」
+Adjust and change state transition	10
+4.1.2	Add description related to initialization of Indicator	14
+	Change Brake Control Inhibit Status = $3 Flag reset condition
+Add description related to Brake Control Inhibit Status = $3 Flag	15
+	Add Temporarily Deactivation Clear condition depending on Brake Temporarily Deactivation signal receive
+Add Lost Communication With TCM into Failure Occurrence condition	16
+4.4	Integrate content of 4.5 into 4.4	19
+	Add tone when switching from 「Brake Control Terminate」 state to 「system OFF」「system ON temporarily deactivation」 into Buzzer List 	19
+	Change Buzzer with tone → “no tone” depending on FAR/NEAR switching in Warning/Brake Control	21
+	Add display condition for sensor dirty information of multi display	22
+4.5	Delete 4.5 due to integrated into 4.4	23
+4.6	Add relation of Indicator Blink and CAN signal of AEB operation indicator	28, 29
+4.7.2	Add 「4.7.2 Vehicle Spec Auto Judgment」	34
+5.1	Add Lost Communication With TCM into Failure Diagnosis condition	35
+
+Ver. 1.1
+(Date:  2014/10/09  Author: 佐藤)
+Chapter	Update content	Page
+1.5	Add 「1.5 Specification Applicable」	4
+2.1	Add AEB Failure W/L Information	7
+3.2.3	Add specification 2 and AEB Failure W/L	10
+4.1.2	Add Failure Occurrence Target	19
+4.4	Add specification 2 and AEB Failure W/L	24
+4.6	Add W/L ON pattern and AEB Failure W/L	30
+5.1	Add recovery condition when recovered normally from failure	37, 38
+	Add Failure diagnosis condition, recovery condition and failure occurrence target	38, 39, 40
+
+AEB Control Requirement Specification Ver. 1.2
+(Date:  2016/1/7  Author: 江畑)
+Chapter	Update content	Page
+Cover	Change Spec name
+AEB User Interface Specification → AEB Control Requirement Specification	1
+2	Add Termilogy	6, 7
+3.2.3	Delete list AEB Failure W/L, AEB Operation Indicator, AEB OFF Indicator in System failure, System OFF, Temporarily Deactivation Notification	11
+3.2.7	Add Warning Brake Control (AEB-P) Request	12
+4.1.2	Correction for Temporarily Deactivation Condition Met / Not met	18, 19
+4.4	・Correction for Buzzer and Multi Display when Brake control operated
+・Add definition for Operation of Blindness detected 	25, 27
+4.6	Correction description of AEB Failure W/L	31
+4.7	Add specification for other functions operation possibility when there is a function operating	35
+4.8.1	Add definition for Warning Brake Control (AEB-P)	37
+4.8.2	Delete Vehicle Spec Auto Judgment	39
+5.1	Add Temporarily Deactivation Condition	40
+5.2	Add Failure Diagnosis Condition
+Delete System Failure Details	41
+
+
+
+
+
+AEB Control Requirement Specification Ver. 1.3
+(Date:  2016/1/19  Author: 宮崎)
+Chapter	Update content	Page
+2	・Delete FAR/NEAR Switch
+・Delete Warning Timing Information in Multi Display (Multi-Display AEB Warning Timing Near/Far)	7, 9
+3.1	Delete FAR/NEAR from system block diagram	10
+3.2.6	Delete Warning Timing Switch Function	11, 12
+3.3	Delete 「Warning Timing Switch Function」	12
+4.3	Delete Warning Timing Switch Function	22
+4.4	Delete AEB Warning Timing Information of Multi Display	25
+4.5	Delete AEB Warning Timing Information	33
+4.6	Delete FAR/NEAR switch	35
+
+AEB Control Requirement Specification Ver. 1.4
+(Date:  2016/2/5  Author: 宮崎)
+Chapter	Update content	Page
+1.5	Delete classification by vehicle model and change into classification by Location	4
+1.6	Add AEB Function Table for each Spec Type	5
+3.2.6	Add Operation Content by Spec Type	10, 11
+4.3	Add Operation Content by Spec Type	22
+4.6.1	Add Operation Content by Spec Type	33, 34
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AEB Control Requirement Specification Ver. 1.5
+(Date:  2016/3/3  Author: 宮崎)
+Chapter	Update content	Page
+-	Change “Moving (Stopped)” to “Moving”	-
+1.6	Update AEB Function Table for each Spec Type	5
+3.2.1	Add Operation Content by Spec Type	9
+3.2.5	Add Operation Content by Spec Type	10
+3.2.6	Add Operation Content by Spec Type	11
+4.1.1	Add Operation Content by Spec Type	13, 14
+4.1.2	Add Operation Content by Spec Type	16,17, 18
+4.2	Add Operation Content by Spec Type	19
+4.3	Add Operation Content by Spec Type	20, 21, 22
+4.4	Add Operation Content by Spec Type	27, 28, 29, 30, 31
+4.4	Add Operation Content related to Warning Timing Switch Function	32
+5.2	Add Operation Content by Spec Type	38
+
+AEB Control Requirement Specification Ver. 1.6
+(Date:  2016/5/27  Author: 江畑)
+Chapter	Update content	Page
+5.1	Deactivate judgment in Temporarily Deactivation Condition, according to Spec Type 	37
+
+AEB Control Requirement Specification Ver. 1.7
+(Date:  2016/9/27  Author: 宮部)
+Chapter	Update content	Page
+1.3	Delete “Related laws and engineering guidelines”	5
+1.4	Add “Specifications priority”	5
+1.6	Applied model	5
+4.3	Delete “User turning OFF AEB, warning about system failure / temporary deactivation, brake control function activation”	23
+4.5	Add “Control condition of Warning Control and Brake Control”	36
+
+AEB Control Requirement Specification Ver. 1.8
+(Date:  2016/10/10  Author: 宮部)
+Chapter	Update content	Page
+4.2	Change unit [ms] of time for determining the state that AEB OFF switch is pressed and held	22
+
+AEB Control Requirement Specification Ver. 1.9
+(Date:  2016/10/20  Author: 宮部)
+Chapter	Update content	Page
+1.5	Updated Applied model	5
+4.4	Deleted the units of parameters	29
+4.4.3	Updated the definition of “ESP is active” in “Suppression’s condition of Warning control and Brake control”	33 – 41
+5.1
+5.2	Changed “Temporary Deactivation” to “System Failure (Reversible Failure)” Changed “System Failure” to “System Failure (Irreversible Failure)”	54
+55
+
+
+AEB Control Requirement Specification Ver. 1.10
+(Date:  2016/12/2  Author: 宮部)
+Chapter	Update content	Page
+4.3	For the contents of “Notification of System OFF due to the driver, System Failure condition (Irreversible Failure) satisfied, System Failure condition (Reversible Failure) satisfied, Warning/Brake Control activation” : cut from “Indicator Control Status_Requirement Specification”, then pasted to “AEB Control_Requirement specification(RB_ACC,AEB)”	23
+4.4.3	Updated some conditions in “Suppression’s condition of Warning control and Brake control”	37
+5	Instructed to refer to “AEB ACC Failure Diagnosis Specification” for conditions of System failure condition (Irreversible Failure) and System failure condition (Reversible Failure)	58
+
+
+AEB Control Requirement Specification Ver. 1.11
+ (Date:  2016/12/14  Author: 宮部)
+Chapter	Update content	Page
+4.4.3	Updated the condition of Pulled State determination in “Suppression’s condition of Warning control and Brake control”	34 ～ 43
+4.4.4	Deleted a condition of Warning Control, a condition of Brake Assist Control, updated the condition of Pulled State determination in “Cancel condition of Warning control and Brake control’s operation”	44 ～ 51
+
+
+
+
+AEB Control Requirement Specification Ver. 1.12
+ (Date:  2017/1/27  Author: 青島)
+Chapter	Update content	Page
+4.5.2	Added “Inhibition of controlling for Small Moving Object (SMO)”	54
+
+
+AEB Control Requirement Specification Ver. 1.13
+ (Date:  2017/2/23  Author: 江畑)
+Chapter	Update content	Page
+4.3	Added “SDR Request from AEB”	31
+
+
+AEB Control Requirement Specification Ver. 1.14
+ (Date:  2017/3/24  Author: 宮部)
+Chapter	Update content	Page
+4.3	Copied contents of Indicator Display request and Multi-Display request from “Indicator Control Status_Requirement Specification”	5, 12, 25~30, 31, 33~36
+4.3	Updated “SDR Request from AEB”	41
+
+
+AEB Control Requirement Specification Ver. 1.15
+ (Date:  2017/4/6  Author: 宮部)
+Chapter	Update content	Page
+	Updated about “Reversible Failure” and “Blindness Detected”	10, 31~33, 41
+4.3	Deleted fixed $0 items from Indicator Display request and Multi-Display request	25~30, 34~37
+4	Deleted detail description of Failure diagnosis	66
+
+
+AEB Control Requirement Specification Ver. 1.16
+ (Date:  2017/4/27  Author: 宮部)
+Chapter	Update content	Page
+4.3	Changed Multi-Display Information for AEB Malfunction displaying condition for Type MFL	29~30
+4.3	Updated description relating to Operation when Blindness is detected	31~32
+
+
+
+AEB Control Requirement Specification Ver. 1.17
+ (Date:  2017/7/3  Author: 宮部)
+Chapter	Update content	Page
+4.3.6	Typo correction for System Failure Condition
+Moved DTC C1659 from System Failure Condition (Irreversible Failure)  System Failure Condition (Reversible Failure)	25, 26, 28, 29
+4.3.6	Change of transmission condition for SDR Request from AEB	41
+
+AEB Control Requirement Specification Ver. 1.18
+ (Date:  2017/7/3  Author: 宮部)
+Chapter	Update content	Page
+4.1.2	Addition of another process for During Initial Check	18
+4.3.5	Addition of extending display for “Multi-Display Request when Warning Control or Braking Control condition is met”	35
+
+AEB Control Requirement Specification Ver. 1.19
+ (Date:  2017/9/7  Author: 宮部)
+Chapter	Update content	Page
+4	Table: Combination List for Functions in AEB ECU
+Addition of a note for YFA 18MC	17
+4.1.2	Updating of “Multi-Display Information for AEB OFF”	20
+4.4.3	Deletion of description for ID3A7 “ACC Failure Warning Request”	32
+4.4.3	Change of description relating to suppression’s condition when ESP is active	46~54
+
+AEB Control Requirement Specification Ver. 1.20
+ (Date:  2018/7/25  Author: Kien N.)
+Chapter	Update content	Page
+4.4.3	Remove the suppression condition related to Accelerator pedal is pressed	46 ~ 52
+
