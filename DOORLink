@@ -1,0 +1,536 @@
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component ENI/SW Modules ENI/CP_SWMTS_EHY_ENI_Suzuki_MRR   00057e40
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component EVI/SW Modules EVI/CP_SWMTS_EHY_EVI_Suzuki_MRR 	00057e80 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component OHY/SW Modules OHY/CP_SWMTS_EHY_OHY_Suzuki_MRR  	00057ec0 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component FUS/SW Modules FUS/CP_SWMTS_EHY_FUS_Suzuki_MRR  	00057f00 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component ACF/SW Modules ACF/CP_SWMTS_FCT_ACF_Suzuki_MRR  	00065f80 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCO/SW Modules FCO/CP_SWMTS_FCT_FCO_Suzuki_MRR  	00066020 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCS/SW Modules FCS/CP_SWMTS_FCT_FCS_Suzuki_MRR	00066560 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem RPM/SW Component REP/SW Modules REP/CP_SWMTS_RPM_REP_Suzuki_MRR	000665a0 -- No implemented rq
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem RPM/SW Component VDI/SW Modules VDI/CP_SWMTS_RPM_VDI_Suzuki_MRR	00066080 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component CDE/SW Modules CDE/CP_SWMTS_SDU_CDE_Suzuki_MRR	00061580 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component DAL/SW Modules DAL/CP_SWMTS_SDU_DAL_Suzuki_MRR	000615c0 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SIO/SW Component NET/SW Modules NET/CP_SWMTS_SIO_NET_Suzuki_MRR	000581c0 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component ATS/SW Modules ATS/CP_SWMTS_SIT_ATS_Suzuki_MRR	00058220 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component SIT/SW Modules SIT/CP_SWMTS_SIT_SIT_Suzuki_MRR	00058260 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component TIA/SW Modules TIA/CP_SWMTS_SIT_TIA_Suzuki_MRR	000815c0 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component DIA/SW Modules DIA/CP_SWMTS_SMU_DIA_Suzuki_MRR 	000582c0 -- -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component SYC/SW Modules SYC/CP_SWMTS_SMU_SYC_Suzuki_MRR	00058300 -- done RC1
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem SRU/SW Component HWA/SW Modules HWA/CP_SWMTS_SRU_HWA_Suzuki_MRR	000583a0 -- done RC1
+
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCO/SW Modules FCO/CP_SWTS_FCT_FCO_Suzuki_MRR    00066027
+//Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component ACF/SW Modules ACF/CP_SWTS_FCT_ACF_Suzuki_MRR    00065f83
+
+
+
+ 
+
+//For System: modify here
+NUMBER_PAGES = 1 //the quantity of pages need to modify
+//arrLinkID_Module= {	"4147106800294823-00057e40","4147106800294823-00057e80",		"4147106800294823-00057ec0",		"4147106800294823-00057f00",		"4147106800294823-00065f80",		"4147106800294823-00066020",		"4147106800294823-00066560",		"4147106800294823-000665a0",		"4147106800294823-00066080",		"4147106800294823-00061580",		"4147106800294823-000615c0",		"4147106800294823-000581c0",		"4147106800294823-00058220",		"4147106800294823-00058260",		"4147106800294823-000815c0",		"4147106800294823-000582c0",		"4147106800294823-00058300",		"4147106800294823-000583a0"}
+//ArrPages_Module = {"/Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component ENI/SW Modules ENI/CP_SWMTS_EHY_ENI_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component EVI/SW Modules EVI/CP_SWMTS_EHY_EVI_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component OHY/SW Modules OHY/CP_SWMTS_EHY_OHY_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component FUS/SW Modules FUS/CP_SWMTS_EHY_FUS_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component ACF/SW Modules ACF/CP_SWMTS_FCT_ACF_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCO/SW Modules FCO/CP_SWMTS_FCT_FCO_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCS/SW Modules FCS/CP_SWMTS_FCT_FCS_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem RPM/SW Component REP/SW Modules REP/CP_SWMTS_RPM_REP_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem RPM/SW Component VDI/SW Modules VDI/CP_SWMTS_RPM_VDI_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component CDE/SW Modules CDE/CP_SWMTS_SDU_CDE_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component DAL/SW Modules DAL/CP_SWMTS_SDU_DAL_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SIO/SW Component NET/SW Modules NET/CP_SWMTS_SIO_NET_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component ATS/SW Modules ATS/CP_SWMTS_SIT_ATS_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component SIT/SW Modules SIT/CP_SWMTS_SIT_SIT_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SIT/SW Component TIA/SW Modules TIA/CP_SWMTS_SIT_TIA_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component DIA/SW Modules DIA/CP_SWMTS_SMU_DIA_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component SYC/SW Modules SYC/CP_SWMTS_SMU_SYC_Suzuki_MRR", "/Suzuki_Yxx_evo14/Product Requirements/Subsystem SRU/SW Component HWA/SW Modules HWA/CP_SWMTS_SRU_HWA_Suzuki_MRR"}
+
+
+////////
+string arrLinkID_Module[NUMBER_PAGES]= {	"4147106800294823-000583a0" }
+string ArrPages_Module[NUMBER_PAGES] = {"/Suzuki_Yxx_evo14/Product Requirements/Subsystem SRU/SW Component HWA/SW Modules HWA/CP_SWMTS_SRU_HWA_Suzuki_MRR"}
+//string ArrPages_Module[NUMBER_PAGES] =  {"/Suzuki_Yxx_evo14/Product Requirements/Subsystem SIO/SW Component NET/SW Modules NET/CP_SWMTS_SIO_NET_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component DIA/SW Modules DIA/CP_SWMTS_SMU_DIA_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem SMU/SW Component SYC/SW Modules SYC/CP_SWMTS_SMU_SYC_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem EHY/SW Component ENI/SW Modules ENI/CP_SWMTS_EHY_ENI_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component CDE/SW Modules CDE/CP_SWMTS_SDU_CDE_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem SDU/SW Component DAL/SW Modules DAL/CP_SWMTS_SDU_DAL_Suzuki_MRR","/Suzuki_Yxx_evo14/Product Requirements/Subsystem FCT/SW Component FCO/SW Modules FCO/CP_SWTS_FCT_FCO_Suzuki_MRR"}
+//string arrLinkID_Module[NUMBER_PAGES]=  {"4147106800294823-000581c0","4147106800294823-000582c0","4147106800294823-00058300","4147106800294823-00057e40","4147106800294823-00061580","4147106800294823-000615c0","4147106800294823-00066027"}
+//////////////////////////
+Array ArrDOORModulePages = create(NUMBER_PAGES,2) //store the updated TCs | Page Name | Link ID
+int count
+for (count = 0; count < NUMBER_PAGES; count++) {
+		put(ArrDOORModulePages, arrLinkID_Module[count], count, 0)
+		put(ArrDOORModulePages, ArrPages_Module[count], count, 1)
+}
+
+
+
+//////////////////////////////////////////////////////////////
+
+//FCT
+//string limitModules[4] = {"4147106800294823-00065f43", "4147106800294823-00065f43", "4147106800294823-00065f43", "4147106800294823-00065f43"}
+
+//RPM
+//string limitModules[4] = {"4147106800294823-00066041", "4147106800294823-00066041", "4147106800294823-00066041", "4147106800294823-00066041"}
+////////////////////////////////////////////////////////
+//Module
+//FCT,TFC
+//string limitModules[4] = {"4147106800294823-00066560", "4147106800294823-00066560", "4147106800294823-00066560", "4147106800294823-00066560"}
+
+//DIA
+//string limitModules[4] = {"4147106800294823-000582c0", "4147106800294823-000582c0", "4147106800294823-000582c0", "4147106800294823-000582c0"}
+
+//EVI/CP_SWMTS_EHY_EVI_Suzuki_MRR
+//string limitModules[1] = {"4147106800294823-00057e80"}
+
+
+
+
+
+//////////////////////////////////////////////////////
+
+string Comment_Content = "test was covered by YFA_48V_AT"
+////// Attribute in RQ page ///
+
+string g_Safety_Integrity = "Safety Integrity"
+string g_ObjectType = "Object Type"
+string g_Status_basedPrj = "Status_YFA_MY18_48V"
+string g_Status_currentPrj =  "Status_YFA_48V_AT"
+string g_Safety[] = {"ASIL A","ASIL B"}
+string g_Object_Identifier = "Object Identifier"
+
+////////////////////////////
+
+objID="Absolute Number"
+TestResultStatus_currentPrj="Test Result Status YFA_48V_AT_R1.0" // Test result status of current prj
+TestResultHis_currentPrj="Test Result Status History YFA_48V_AT"  // Test result HIs status of current prj
+TestResultHis_basedPrj="Test Result Status History YFA_MY18_48V"  // Test result his status of based prj
+ 
+CommentCol = "Comment YFA_48V_AT" //comment attribute 
+count=0
+countfailed=0
+countUpdated = 0
+Array ArrObjectInforFailed = create(100,1) //store the failed TCs
+Array ArrObjectInforUpdated = create(100,2) //store the updated TCs
+
+/////////////// PL ///////////////////////////
+
+
+
+
+//check the pattern is in the string or not
+int checkString(string arrStr, string search)
+{
+		Buffer buf = create()
+		buf  = arrStr
+		int index = -1	
+			index = contains(buf, search, index)
+			if (index != -1)
+			{
+				return 1
+			}
+			else
+			{
+				return 0
+			}
+
+}
+
+
+//Get the latest status based on the History
+//return -1: -
+// return 1:  passed
+//return 2:  n/a
+//return 3: failed
+int checkLatestStatus(string arrStr)
+{
+		string status[] = {"passed","n/a", "failed" }
+		Buffer buf = create()
+		buf  = arrStr
+		///print arrStr
+		int index[3] = {-1, -1, -1}
+ 
+		
+			 index[0] = contains(buf, status[0], index[0])
+			 index[1] = contains(buf, status[1], index[1])
+			 index[2] = contains(buf, status[2], index[2])
+			 //print "index 0" index[0] "---index 1" index[1] "---index 2" index[2] ""
+		if ((index[0] == 1) and  (index[1] == 1) and  (index[2] == 1) )
+		{
+			return -1 //status is "-"
+		}
+		else
+		{
+			if ((index[0] > index[1]) and (index[0] > index[2]))
+			{
+				return 1 // passed
+			}
+			else if ((index[1] > index[0]) and (index[1] > index[2]))
+			{
+				return 2 // n/a
+				
+			}	
+			else
+			{
+				return 3 // failed
+				
+			}
+		}
+		
+}
+
+
+///// Func to check the valid RQs
+//return 0: RQ is not implemented OR not a RQ
+//return 1: RQ is implemented AND Safety = non ASIL - AB
+//return 2: RQ is implemented AND Safety = ASIL-AB
+int CheckValidRQ(Object obj)
+{
+		//1. Test case linked by Implemented requirement
+		//2. Non ASIL A/B req.
+		
+	
+
+	//Get data from the obj	
+	  string t_Safety = probeRichAttr_(obj,g_Safety_Integrity, false)
+	  string t_Status_rq = probeRichAttr_(obj,g_Status_currentPrj , false)
+	  string t_ObjType = probeRichAttr_(obj,g_ObjectType , false)
+	  if (t_ObjType == "Requirement")   
+	  {
+		bool b_RQ_Impl = false
+		bool b_Safety = false
+			if (t_Status_rq == "Implemented")
+			{
+				b_RQ_Impl = true
+			}
+			if ((t_Safety != g_Safety[0]) and (t_Safety != g_Safety[1]))
+			{
+				b_Safety = true
+			}
+		
+		
+		//// return calc
+		if (b_RQ_Impl != true)
+		{
+			
+			return 0
+		}			
+		else // RQ is implemented 
+		{
+			if (b_Safety == true) // non ASIL-AB RQ
+			{
+				return 1
+			}
+			else // ASIL-AB RQ
+			{
+				return 2
+				
+			}
+			
+		}
+		
+		 
+	  
+	  }
+	  else
+		  return 0
+	
+}
+
+//Func to check valid TC
+// return 0: invalid
+// return 1: valid --> passed, failed or n/a
+
+int CheckValidTC(Object obj)
+
+{
+		//3. With “passed” or “n/a” for “Test result History YSB Sports” (base project)
+		//4. With “-“ for “Test result status YSB Sports RC1” (current project)
+	
+	string t_TestResultStatus_currentPrj = obj.TestResultStatus_currentPrj	  //Result Status YSB Sports RC1 of current Test case
+	string t_TestResultHis_basedPrj = obj.TestResultHis_basedPrj   //His Result Status YSB Sports of current Test case
+	string t_ObjType = obj.g_ObjectType
+	if (!null obj and (t_ObjType == "Test Case")   )
+	{
+	   if   (t_TestResultStatus_currentPrj  == "-")  
+	   {
+		int check1 = checkString(t_TestResultHis_basedPrj, "failed")
+		int check2 = checkString(t_TestResultHis_basedPrj, "passed")
+		int check3 = checkString(t_TestResultHis_basedPrj, "n/a")
+		
+			if ( (check1 == 1) or  (check2 == 1) or  (check3 == 1) ) 
+			  {
+				   
+				   
+				    return 1 //valid
+				  
+			}
+			
+			else
+			{
+				return 0 //invalid
+			}
+		}
+		else
+		{
+			return 0 //invalid
+			
+		}
+	}
+	
+	else
+			{
+				return 0 //invalid
+			}
+			
+}
+
+
+/////////////
+pragma runLim, 0
+
+
+int lines[4] = {0, 0, 0, 0}
+
+
+void adjustLines(int depth, showAtDepth) {
+    int count
+    for (count = 0; count < 4; count++) {
+        while (lines[depth-1] < lines[count]) {
+            if (depth == showAtDepth) displayRich("\\pard " " ")
+            lines[depth-1]++
+        }
+    }
+}
+
+bool IsRQValid(Object o, int depth, string arrLim[]) {
+    Link l
+    LinkRef lr
+    ModName_ otherMod = null
+    Module linkMod = null
+    ModuleVersion otherVersion = null
+    Object othero
+    string disp = null
+    string s = null
+    string plain, plainDisp
+    int plainTextLen
+    int count
+    bool doneOne = false
+    string linkModName = "*"
+	int returnVal = 0
+	string ID = o."Absolute Number"
+	print "------------------Check Test Case: "ID "----------- \n"
+    for l in o->linkModName do {
+        otherVersion = targetVersion l
+        otherMod = module(otherVersion)
+        if (null otherMod || isDeleted otherMod) continue
+        if (!equal(getItem otherMod, (itemFromID arrLim[depth-1]))) continue
+        othero = target l
+        if (null othero) {
+            load(otherVersion,false)
+        }
+        othero = target l
+        if (null othero) continue
+        if (isDeleted othero) continue
+		
+		
+        int oldLines = lines[depth-1]
+        adjustLines(depth, 1)
+        bool kick = (doneOne) && (lines[depth-1] == oldLines)
+        if (kick) {
+            lines[depth-1]++
+            if (depth == 1) displayRich("\\pard " " ")
+        }
+        //if (depth < 4) {
+        //    IsRQValid(othero, depth+1)
+        //}
+        doneOne = true
+		lines[depth-1] += 1
+		returnVal = CheckValidRQ(othero)
+		if (returnVal == 2) //if any linked RQ is ASIL AB --> stop checking
+		{	
+			string ID = probeRichAttr_(othero,g_Object_Identifier , false)
+			print "     Test case linked to ASIL-AB Requirement: " ID "\n"
+			return false
+			
+		}
+        
+    }
+	//if (depth == 1) {
+    //    ExternalLink extLink
+    //    doneOne = false
+    //    for extLink in o->"" do {
+    //        if (!doneOne) {
+    //            displayRich("\\pard " "{\\b External Links:}")
+    //            doneOne = true
+    //       }
+    //    }
+    //}
+	
+	 
+	//after check all linked RQ	
+    if (returnVal == 1) 
+		{
+					 
+			print "Test cases is valid \n"
+            return true
+        }
+	else	
+	{	
+		print "Test cases is invalid \n"
+		return false
+    
+	}
+	
+}
+
+////////////////////////////////////////////
+
+
+
+
+///////////////////////////////// MAIN //////////////////////////////////
+
+
+for ( i = 0; i < NUMBER_PAGES; i ++)
+{
+	Array ArrObjectInforFailed = create(10000,1) //store the failed TCs
+	Array ArrObjectInforUpdated = create(10000,2) //store the updated TCs
+			
+	string t_Link = get(ArrDOORModulePages, i, 0)
+	string t_page = get(ArrDOORModulePages, i, 1)
+	currMod = t_page
+	string limitModules[4] = {t_Link,t_Link,t_Link,t_Link}
+	
+	Module c_module = edit(currMod, true) // get access to edit mode
+	Object obj
+	index = 0
+	indexUpdatedTC = 0 // count number of updated test case
+	print "------------------------------- " t_page" -------------------------------\n\n" 
+	
+	if (exists attribute CommentCol) // check comment col exist
+	{
+	}
+	else //create
+	{
+		print "Created "CommentCol "\n"
+		create object type "Text" attribute CommentCol
+		 
+	}
+
+	if (exists attribute TestResultStatus_currentPrj) // check Test status of current prj  exist
+	{
+		//do nothing
+	}
+	else
+	{
+		print "Created " TestResultStatus_currentPrj "\n"
+		create object type "Test_Status" (default "-") attribute TestResultStatus_currentPrj
+		
+		//check the exist of History current prj
+		if (exists attribute TestResultHis_currentPrj)
+		{
+			//do nothing
+		}
+		
+		else // create new
+		{
+			print "Created "TestResultHis_currentPrj "\n"
+			create object type "Text" attribute TestResultHis_currentPrj
+		}
+
+	}
+	
+	
+	for obj in c_module do
+	{
+		//Get current values
+			
+			string t_TestResultStatus_currentPrj = obj.TestResultStatus_currentPrj	  //Result Status current prj of Test case
+			string t_TestResultHis_basedPrj = obj.TestResultHis_basedPrj   //His Result based prj of Test case
+			//string t_ObjType = obj.ObjectType  //object type of current Test case
+			string t_objID = obj.objID  //object ID of current Test case
+			bool failedTC = false
+			bool updatedTC = false
+			string tempReStatus = "-"
+		///////////////////
+		int t_result = CheckValidTC(obj)
+		if (t_result != 0)//valid TC
+		{
+			bool tempResult = IsRQValid(obj, 1,limitModules )
+			if (tempResult == true) // RQ valid
+			{
+				//get the lastest status from based prj
+				int tempStatus = checkLatestStatus(t_TestResultHis_basedPrj)
+				if (tempStatus != -1)
+				{
+					
+					if (tempStatus == 1) //passed
+					{
+						 tempReStatus = "passed"
+						 updatedTC = true
+					}
+					else if (tempStatus == 2) //n/a
+					{
+						tempReStatus = "n/a"
+						updatedTC = true
+					}
+					else // failed
+					{
+						tempReStatus = "failed"
+						failedTC = true
+					}
+					
+					// update the Test status
+					
+					obj.TestResultStatus_currentPrj = tempReStatus
+					
+					//after that, add the comment
+						  string t_comment = obj.CommentCol
+						  if (t_comment == "") //if there was NO previous comment
+						  {
+							obj.CommentCol = Comment_Content
+						  }
+						  else //if there was a previous comment
+						  {
+							obj.CommentCol = t_comment "\n---------------------------------------------------------------\n" + Comment_Content
+						  }
+				
+				}
+			}
+		}
+
+		else 
+			
+			{
+				
+				//do nothing
+			}
+		
+				//if any failed status in the History, it will be stored here
+				if ( failedTC == true)
+				{
+					countfailed++
+					put(ArrObjectInforFailed, t_objID, index, 0)
+					index++
+					failedTC = false
+				}
+				if ( updatedTC == true)
+				{
+					countUpdated++
+					put(ArrObjectInforUpdated, t_objID, indexUpdatedTC, 0)
+					put(ArrObjectInforUpdated, tempReStatus, indexUpdatedTC, 1)
+					indexUpdatedTC++
+					updatedTC = false
+				}
+				
+				
+	}
+			
+	 /////Print to the console
+	print "------------------------------- " t_page" -------------------------------\n" 	 
+	if (countfailed > 0)
+	{
+		for (loop = 0; loop < countfailed; loop ++)
+		{
+			print "-------------------------------\nList failed TCs \n"
+			print (string get(ArrObjectInforFailed, loop, 0)) "\n"
+		}
+	} 
+	if (countUpdated > 0)
+	{
+		for (loop = 0; loop < countUpdated; loop ++)
+		{
+			
+			print "-------------------------------\nList Updated TCs: \n"
+			print "No "(loop+1) " : Test case "(string get(ArrObjectInforUpdated, loop, 0)) " to " (string get(ArrObjectInforUpdated, loop, 1)) "\n"
+		}
+	}
+
+	print "-------------------------------  END -------------------------------\n\n" 	
+	
+	
+	 
+	//close(t_page) // close and save
+
+}
