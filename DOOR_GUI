@@ -1,0 +1,89 @@
+__author__ = 'dyuh2c'
+
+import sys
+if not sys.version_info < (2, 9, 9):
+    # Python 3
+    from tkinter import *
+else:
+    # Python 2
+    from Tkinter import *
+
+import os
+import DoorsFill
+import message
+
+
+fields = ('SWTS/SWRTS Module Name', 'Test result status')
+mks_dir_global = ''
+input_GUI = {}
+
+def makeform(root, fields):
+    entries = {}
+    for field in fields:
+        row = Frame(root)
+        lab = Label(row, width=15, text=field + ": ", anchor='w')
+        if field == 'Password':
+            my_entry = Entry(row, show="*")
+        else:
+            my_entry = Entry(row, width = 50)
+            my_entry.insert(0, "Insert here...")
+            my_entry.configure(state=DISABLED)
+            
+        
+        row.pack(side=TOP, fill=X, padx=4, pady=10)
+        lab.pack(side=LEFT)
+        my_entry.pack(side=RIGHT, expand=NO, fill=X ,padx=4, pady=10)
+        entries[field] = my_entry
+    on_click_id = my_entry.bind('<Button-1>',  on_click)
+    return entries
+
+
+if __name__ == '__main__':
+    root = Tk()
+    root.title('UpDoor System Test')
+    row = Frame(root)
+    root.resizable(0, 0)
+    field = fields[0]
+    lab = Label(row, width=25, text=field + ": ", anchor='w')    
+    my_entry = Entry(row, width = 50)
+    my_entry.insert(0, "Ex: CP_SYSTS_SMU_Suzuki_MRR")
+    my_entry.configure(state=DISABLED)
+    def on_click(event):
+        my_entry.configure(state=NORMAL)
+        my_entry.delete(0, END)
+    
+        # make the callback only work once
+        my_entry.unbind('<Button-1>', on_click_id)
+    
+    row.pack(side=TOP, fill=X, padx=4, pady=10)
+    lab.pack(side=LEFT)
+    my_entry.pack(side=RIGHT, expand=NO, fill=X ,padx=4, pady=10)    
+        
+    on_click_id = my_entry.bind('<Button-1>',  on_click)
+    
+    row = Frame(root)
+    field = fields[1]
+    lab = Label(row, width=15, text=field + ": ", anchor='w')    
+    my_entry1 = Entry(row, width = 50)
+    my_entry1.insert(0, "Ex: Test Result Status YFA_MY18_S1_HEV_R2.0")
+    my_entry1.configure(state=DISABLED)
+    def on_click1(event):
+        my_entry1.configure(state=NORMAL)
+        my_entry1.delete(0, END)
+    
+        # make the callback only work once
+        my_entry1.unbind('<Button-1>', on_click_id1)
+    
+    row.pack(side=TOP, fill=X, padx=4, pady=10)
+    lab.pack(side=LEFT)
+    my_entry1.pack(side=RIGHT, expand=NO, fill=X ,padx=4, pady=10)    
+        
+    on_click_id1 = my_entry1.bind('<Button-1>',  on_click1)
+    
+    b1 = Button(root, text='Quit', command= root.quit)
+    b1.pack(side=LEFT, padx=10, pady=10)
+    b2 = Button(root, text='Generate',
+                command= lambda: DoorsFill.Process(my_entry.get().strip(), my_entry1.get().strip()))
+    b2.pack(side=RIGHT, padx=10, pady=10)
+  
+    root.mainloop()
