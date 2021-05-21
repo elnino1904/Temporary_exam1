@@ -1,0 +1,36 @@
+import os
+import subprocess
+
+path_folder = os.getcwd()
+loc_7z = r"C:\Program Files\7-Zip\7z.exe"
+for root, dirs, files in os.walk("."):
+    for filename in files:
+
+        if filename != 'Run7zip.py' and filename != 'Run7zip.bat':
+
+            Path_ZipFile = path_folder + '\\' + filename
+            NameToArchive = os.path.splitext(Path_ZipFile)[0]
+            dummy_out_path = os.path.join(path_folder, NameToArchive + ".7z")
+            archive_command = r'"{}" a "{}" "{}"'.format(loc_7z, dummy_out_path, Path_ZipFile)
+            subprocess.call(archive_command, shell=True)
+            
+input('Finshed....')
+
+
+def SecurityAccess(SEED_H, SEED_L):
+    CK = [198, 23, 114, 17, 57, 131]
+    for i in range(0,3):
+        x = 255-(SEED_L^CK[2*i]); x &= 0x00ff
+        y = x; y >>= 7; y &=0x00ff; 
+        x <<= 1; x &= 0x00ff; 
+        x +=y; x &= 0x00ff; 
+        z = x^SEED_H; z &= 0x00ff
+        
+        x = 255-(z^CK[2*i+1]); x&= 0x00ff
+        y=x; y>>=4; y&=0x00ff
+        x<<=4; x&=0x00ff
+        x+=y; x&=0x00ff
+        SEED_H = x^SEED_L; SEED_H=SEED_H&0x00ff
+        SEED_L = z
+    KEY_H = SEED_H; KEY_L = SEED_L; 
+    return [KEY_H, KEY_L] 
